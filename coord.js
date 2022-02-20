@@ -14,10 +14,10 @@ module.exports = {
     },
 
     coord2flagsEqX(d1, x1, y1, d2, x2, y2) {
-        let y = (y2 ** 2 - y1 ** 2 + d1 ** 2 - d2 ** 2) / (2 * (y2 - y1))
+        y = (y2 ** 2 - y1 ** 2 + d1 ** 2 - d2 ** 2) / (2 * (y2 - y1))
 
-        let goodPoints = [] // Возможные координаты
-        let x = x1 + Math.sqrt(d1 ** 2 - (y - y1) ** 2)
+        goodPoints = [] // Возможние координаты
+        x = x1 + Math.sqrt(d1 ** 2 - (y - y1) ** 2)
         if (this.checkPoint(d1, x1, y1, d2, x2, y2, x, y))
             goodPoints.push({x: x, y: y})
 
@@ -29,14 +29,14 @@ module.exports = {
     },
 
     coord2flagsEqY(d1, x1, y1, d2, x2, y2) {
-        let x = (x2 ** 2 - x1 ** 2 + d1 ** 2 - d2 ** 2) / (2 * (x2 - x1))
+        x = (x2 ** 2 - x1 ** 2 + d1 ** 2 - d2 ** 2) / (2 * (x2 - x1))
 
-        let goodPoints = [] // Возможние координаты
+        goodPoints = [] // Возможние координаты
         y = y1 + Math.sqrt(d1 ** 2 - (x - x1) ** 2)
         if (this.checkPoint(d1, x1, y1, d2, x2, y2, x, y))
             goodPoints.push({x: x, y: y})
 
-        let y = y1 - Math.sqrt(d1 ** 2 - (x - x1) ** 2)
+        y = y1 - Math.sqrt(d1 ** 2 - (x - x1) ** 2)
         if (this.checkPoint(d1, x1, y1, d2, x2, y2, x, y))
             goodPoints.push({x: x, y: y})
 
@@ -44,7 +44,7 @@ module.exports = {
     },
 
     sqrtWithCheck(n) {
-        let eps = 0.00001
+        eps = 0.00001
         if (Math.abs(n) < eps)
             return 0
         return n
@@ -144,34 +144,110 @@ module.exports = {
 
     parseCoord(p) {
         // Координаты каждого флага
+        // const Flags = {
+        //     ftl50: {x: -50, y: 39}, ftl40: {x: -40, y: 39},
+        //     ftl30: {x: -30, y: 39}, ftl20: {x: -20, y: 39},
+        //     ftl10: {x: -10, y: 39}, ft0: {x: 0, y: 39},
+        //     ftr10: {x: 10, y: 39}, ftr20: {x: 20, y: 39},
+        //     ftr30: {x: 30, y: 39}, ftr40: {x: 40, y: 39},
+        //     ftr50: {x: 50, y: 39}, fbl50: {x: -50, y: -39},
+        //     fbl40: {x: -40, y: -39}, fbl30: {x: -30, y: -39},
+        //     fbl20: {x: -20, y: -39}, fbl10: {x: -10, y: -39},
+        //     fb0: {x: 0, y: -39}, fbr10: {x: 10, y: -39},
+        //     fbr20: {x: 20, y: -39}, fbr30: {x: 30, y: -39},
+        //     fbr40: {x: 40, y: -39}, fbr50: {x: 50, y: -39},
+        //     flt30: {x: -57.5, y: 30}, flt20: {x: -57.5, y: 20},
+        //     flt10: {x: -57.5, y: 10}, fl0: {x: -57.5, y: 0},
+        //     flb10: {x: -57.5, y: -10}, flb20: {x: -57.5, y: -20},
+        //     flb30: {x: -57.5, y: -30}, frt30: {x: 57.5, y: 30},
+        //     frt20: {x: 57.5, y: 20}, frt10: {x: 57.5, y: 10},
+        //     fr0: {x: 57.5, y: 0}, frb10: {x: 57.5, y: -10},
+        //     frb20: {x: 57.5, y: -20}, frb30: {x: 57.5, y: -30},
+        //     fglt: {x: -52.5, y: 7.01}, fglb: {x: -52.5, y: -7.01},
+        //     gl: {x: -52.5, y: 0}, gr: {x: 52.5, y: 0}, fc: {x: 0, y: 0},
+        //     fplt: {x: -36, y: 20.15}, fplc: {x: -36, y: 0},
+        //     fplb: {x: -36, y: -20.15}, fgrt: {x: 52.5, y: 7.01},
+        //     fgrb: {x: 52.5, y: -7.01}, fprt: {x: 36, y: 20.15},
+        //     fprc: {x: 36, y: 0}, fprb: {x: 36, y: -20.15},
+        //     flt: {x: -52.5, y: 34}, fct: {x: 0, y: 34},
+        //     frt: {x: 52.5, y: 34}, flb: {x: -52.5, y: -34},
+        //     fcb: {x: 0, y: -34}, frb: {x: 52.5, y: -34}
+        // }
         const Flags = {
-            ftl50: {x: -50, y: 39}, ftl40: {x: -40, y: 39},
-            ftl30: {x: -30, y: 39}, ftl20: {x: -20, y: 39},
-            ftl10: {x: -10, y: 39}, ft0: {x: 0, y: 39},
-            ftr10: {x: 10, y: 39}, ftr20: {x: 20, y: 39},
-            ftr30: {x: 30, y: 39}, ftr40: {x: 40, y: 39},
-            ftr50: {x: 50, y: 39}, fbl50: {x: -50, y: -39},
-            fbl40: {x: -40, y: -39}, fbl30: {x: -30, y: -39},
-            fbl20: {x: -20, y: -39}, fbl10: {x: -10, y: -39},
-            fb0: {x: 0, y: -39}, fbr10: {x: 10, y: -39},
-            fbr20: {x: 20, y: -39}, fbr30: {x: 30, y: -39},
-            fbr40: {x: 40, y: -39}, fbr50: {x: 50, y: -39},
-            flt30: {x: -57.5, y: 30}, flt20: {x: -57.5, y: 20},
-            flt10: {x: -57.5, y: 10}, fl0: {x: -57.5, y: 0},
-            flb10: {x: -57.5, y: -10}, flb20: {x: -57.5, y: -20},
-            flb30: {x: -57.5, y: -30}, frt30: {x: 57.5, y: 30},
-            frt20: {x: 57.5, y: 20}, frt10: {x: 57.5, y: 10},
-            fr0: {x: 57.5, y: 0}, frb10: {x: 57.5, y: -10},
-            frb20: {x: 57.5, y: -20}, frb30: {x: 57.5, y: -30},
-            fglt: {x: -52.5, y: 7.01}, fglb: {x: -52.5, y: -7.01},
-            gl: {x: -52.5, y: 0}, gr: {x: 52.5, y: 0}, fc: {x: 0, y: 0},
-            fplt: {x: -36, y: 20.15}, fplc: {x: -36, y: 0},
-            fplb: {x: -36, y: -20.15}, fgrt: {x: 52.5, y: 7.01},
-            fgrb: {x: 52.5, y: -7.01}, fprt: {x: 36, y: 20.15},
-            fprc: {x: 36, y: 0}, fprb: {x: 36, y: -20.15},
-            flt: {x: -52.5, y: 34}, fct: {x: 0, y: 34},
-            frt: {x: 52.5, y: 34}, flb: {x: -52.5, y: -34},
-            fcb: {x: 0, y: -34}, frb: {x: 52.5, y: -34}
+            //TOP LINE
+            ftl50: {x: -50, y: -39},
+            ftl40: {x: -40, y: -39},
+            ftl30: {x: -30, y: -39},
+            ftl20: {x: -20, y: -39},
+            ftl10: {x: -10, y: -39},
+            ft0: {x: 0, y: -39},
+            ftr10: {x: 10, y: -39},
+            ftr20: {x: 20, y: -39},
+            ftr30: {x: 30, y: -39},
+            ftr40: {x: 40, y: -39},
+            ftr50: {x: 50, y: -39},
+
+            //BOTTOM LINE
+            fbl50: {x: -50, y: 39},
+            fbl40: {x: -40, y: 39},
+            fbl30: {x: -30, y: 39},
+            fbl20: {x: -20, y: 39},
+            fbl10: {x: -10, y: 39},
+            fb0: {x: 0, y: 39},
+            fbr10: {x: 10, y: 39},
+            fbr20: {x: 20, y: 39},
+            fbr30: {x: 30, y: 39},
+            fbr40: {x: 40, y: 39},
+            fbr50: {x: 50, y: 39},
+
+            //LEFT LINE
+            flt30: {x: -57.5, y: -30},
+            flt20: {x: -57.5, y: -20},
+            flt10: {x: -57.5, y: -10},
+            fl0: {x: -57.5, y: 0},
+            flb10: {x: -57.5, y: 10},
+            flb20: {x: -57.5, y: 20},
+            flb30: {x: -57.7, y: 30},
+
+            //RIGHT LINE
+            frt30: {x: 57.5, y: -30},
+            frt20: {x: 57.5, y: -20},
+            frt10: {x: 57.5, y: -10},
+            fr0: {x: 57.5, y: 0},
+            frb10: {x: 57.5, y: 10},
+            frb20: {x: 57.5, y: 20},
+            frb30: {x: 57.5, y: 30},
+
+            //LEFT GOALS
+            fglt: {x: -52.5, y: -7.01},
+            gl: {x: -52.5, y: 0},
+            fglb: {x: -52.5, y: 7.01},
+
+            //RIGHT GOALS
+            fgrt: {x: 52.5, y: -7.01},
+            gr: {x: 52.5, y: 0},
+            fgrb: {x: 52.5, y: 7.01},
+
+            //CENTER LINE
+            fct: {x: 0, y: -34},
+            fc: {x: 0, y: 0},
+            fcb: {x: 0, y: 34},
+
+            //LEFT PENALTY AREA
+            fplt: {x: -36, y: -20.15},
+            fplc: {x: -36, y: 0},
+            fplb: {x: -36, y: 20.15},
+
+            //RIGHT PENALTY AREA
+            fprt: {x: 36, y: -20.15},
+            fprc: {x: 36, y: 0},
+            fprb: {x: 36, y: 20.15},
+
+            //CORNERS
+            flb: {x: -52.5, y: 34},
+            flt: {x: -52.5, y: -34},
+            frb: {x: 52.5, y: 34},
+            frt: {x: 52.5, y: -34}
         }
 
         p.shift()
@@ -202,7 +278,7 @@ module.exports = {
                 for (let j = i + 1; j < p.length; j++) {
                     if (forFlag) {
                         for (let k = j + 1; k < p.length; k++) {
-                            if (p[i].x !== p[j].x && p[i].y !== p[j].y && p[i].x !== p[k].x && p[i].y !== p[k].y) {
+                            if (p[i].x != p[j].x && p[i].y != p[j].y && p[i].x != p[k].x && p[i].y != p[k].y) {
                                 indexes = [i, j, k]
                                 forFlag = false
                                 break
