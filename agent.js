@@ -14,6 +14,7 @@ class Agent {
         this.xCoordEnemy = null
         this.yCoordEnemy = null
         this.id = null
+        this.v = null // Скорость вращения
     }
 
     msgGot(msg) { // Получение сообщения
@@ -24,6 +25,10 @@ class Agent {
 
     setSocket(socket) { // Настройка сокета
         this.socket = socket
+    }
+
+    setV(v) {
+        this.v = v
     }
 
     socketSend(cmd, value) { // Отправка команды
@@ -78,7 +83,7 @@ class Agent {
                     this.socketSend(this.act.n, this.act.v)
             }
             if (this.playOn) {
-                this.act = {n: "turn", v: 20}
+                this.act = {n: "turn", v: this.v}
                 this.socketSend(this.act.n, this.act.v)
                 if (this.xCoord && this.yCoord) {
                     console.log("Координаты игрока:", this.xCoord.toFixed(2), this.yCoord.toFixed(2)) // Вывод расчитанных координат
