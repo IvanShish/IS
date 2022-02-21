@@ -66,14 +66,6 @@ class Agent {
             this.xCoordEnemy = null
             this.yCoordEnemy = null
         }
-        if (this.xCoord && this.yCoord) {
-            console.log("Координаты игрока:", this.xCoord.toFixed(2), this.yCoord.toFixed(2)) // Вывод расчитанных координат
-        } else {
-            console.log("Невозможно определить координаты игрока")
-        }
-        if (this.xCoordEnemy && this.yCoordEnemy) {
-            console.log("Координаты противника:", this.xCoordEnemy.toFixed(2), this.yCoordEnemy.toFixed(2))
-        }
 
     }
 
@@ -88,6 +80,14 @@ class Agent {
             if (this.playOn) {
                 this.act = {n: "turn", v: 20}
                 this.socketSend(this.act.n, this.act.v)
+                if (this.xCoord && this.yCoord) {
+                    console.log("Координаты игрока:", this.xCoord.toFixed(2), this.yCoord.toFixed(2)) // Вывод расчитанных координат
+                } else {
+                    console.log("Невозможно определить координаты игрока")
+                }
+                if (this.xCoordEnemy && this.yCoordEnemy) {
+                    console.log("Координаты противника:", this.xCoordEnemy.toFixed(2), this.yCoordEnemy.toFixed(2))
+                }
             }
             this.act = null // Сброс команды
         }

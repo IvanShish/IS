@@ -270,26 +270,26 @@ module.exports = {
     },
 
     selectFlags(p) {
-        let indexes
-        forFlag = true
+        let indexes = null
+        let minDist = Infinity 
 
+        // Перебираем флаги и находим 3 флага не на одной прямой и с минимальным расстоянием от игрока
         for (let i = 0; i < p.length; i++) {
-            if (forFlag) {
-                for (let j = i + 1; j < p.length; j++) {
-                    if (forFlag) {
-                        for (let k = j + 1; k < p.length; k++) {
-                            if (p[i].x != p[j].x && p[i].y != p[j].y && p[i].x != p[k].x && p[i].y != p[k].y) {
-                                indexes = [i, j, k]
-                                forFlag = false
-                                break
-                            }
+            for (let j = i+1; j < p.length; j++) {
+                for (let k = j+1; k < p.length; k++) {
+                    if (p[i].x != p[j].x && p[i].y != p[j].y && p[i].x != p[k].x && p[i].y != p[k].y && 
+                        p[j].x != p[k].x && p[j].y != p[j].k) {
+                        currentSum =  p[i].d + p[j].d + p[k].d
+                        if (currentSum < minDist) {
+                            minDist = currentSum
+                            indexes = [i,j,k]
                         }
                     }
                 }
             }
         }
 
-        if (forFlag)
+        if (!indexes) 
             return null
         return indexes
     },
