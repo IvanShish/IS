@@ -2,6 +2,7 @@
 const Msg = require('./msg')
 // Подключение модуля расчета координат
 const coord = require('./coord')
+const Controller = require("./controller")
 
 class Agent {
     constructor() {
@@ -15,11 +16,13 @@ class Agent {
         this.yCoordEnemy = null
         this.id = null
         this.v = null // Скорость вращения
+        this.controller = new Controller()
+        this.controller.setAgent(this)
     }
 
     msgGot(msg) { // Получение сообщения
         let data = msg.toString('utf8') // Приведение к строке
-        this.processMsg(data) // Разбор сообщения
+        this.controller.processMsg(data) // Разбор сообщения
         this.sendCmd() // Отправка команды
     }
 
@@ -33,45 +36,6 @@ class Agent {
 
     socketSend(cmd, value) { // Отправка команды
         this.socket.sendMsg(`(${cmd} ${value})`)
-    }
-
-    processMsg(msg) { // Обработка сообщения
-        let data = Msg.parseMsg(msg) // Разбор сообщения
-        if (!data) throw new Error("Parse error\n" + msg)
-        // Первое (hear) - начало игры
-        if (data.cmd === "hear") this.analyzeHear(data.p)
-        if (data.cmd === "init") this.initAgent(data.p) // Инициализация
-        if (data.cmd === "see") this.analyzeSee(data.msg, data.cmd, data.p) // Обработка
-    }
-
-    initAgent(p) {
-        if (p[0] === "r") this.position = "r" // Правая половина поля
-        if (p[1]) this.id = p[1] // id игрока
-    }
-
-    analyzeHear(p) {
-        if (p[2] === "play_on") {
-            this.playOn = true
-        }
-        this.run = true
-    }
-
-    analyzeSee(msg, cmd, p) { // Анализ сообщения
-        if (!this.run) return
-
-        let xy = coord.calculateCoord(p) // Расчет координат игрока
-        if (xy.flags) {
-            this.xCoord = xy.flags.x
-            this.yCoord = xy.flags.y
-        }
-        if (xy.players) {
-            this.xCoordEnemy = xy.players.x
-            this.yCoordEnemy = xy.players.y
-        } else {
-            this.xCoordEnemy = null
-            this.yCoordEnemy = null
-        }
-
     }
 
     sendCmd() {
