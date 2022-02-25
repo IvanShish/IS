@@ -214,7 +214,7 @@ module.exports = {
                 flagName = ""
                 for (let i of value.cmd.p)
                     flagName += i
-                points.push({x: Flags[flagName].x, y: Flags[flagName].y, d: value.p[0], a: value.p[1]})
+                points.push({x: Flags[flagName].x, y: Flags[flagName].y, d: value.p[0], a: value.p[1], flagName: flagName})
             } else if (value.cmd.p[0] === 'p') {
                 players.push({d: value.p[0], a: value.p[1]})
             }

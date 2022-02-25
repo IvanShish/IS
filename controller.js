@@ -31,19 +31,13 @@ class Controller {
     analyzeHear(p) {
         if (p[2] === "play_on") {
             this.agent.playOn = true
+            this.agent.run = true
         } else if (p[2].startsWith("goal")) {
-
+            this.agent.run = false
         }
-        this.agent.run = true
     }
 
     analyzeSee(msg, cmd, p) { // Анализ сообщения
-        const objects = this.getAllObjects(p)
-        const flags = objects.f.sort((a, b) => a.d - b.d)
-        if (flags.length >= 3) {
-            let coords = coord.calculateCoord(flags)
-            const act = this.actions[this.currAction++].act
-        }
         if (!this.agent.run) return
 
         let xy = coord.calculateCoord(p) // Расчет координат игрока
@@ -59,6 +53,58 @@ class Controller {
             this.agent.yCoordEnemy = null
         }
 
+        const objects = this.getAllObjects(p)
+        const flags = objects.f
+        if (flags.length >= 3) {
+            let coords = coord.parseCoord(flags)
+            this.analyzeAction(coords.flags)
+        }
+    }
+
+    analyzeAction(objects) {
+        const action = this.actions[this.currAction]
+        if (!action) return
+
+        // objects.sort((a, b) => a.d - b.d)
+        if (action.act === "flag") {
+            const fl = objects.find(e => e.flagName === action.fl)
+
+            if (!fl) {
+                // Искомый флаг не виден, значит игроку следует повернуться в поисках
+                // искомого флага
+                this.agent.act = {
+                    n: 'turn',
+                    v: 30
+                }
+                return
+            }
+
+            if (Math.abs(fl.a) > 30) {  // TODO: какое условие?
+                // Искомый флаг виден и находится далеко от игрока, тогда необходимо
+                // повернуться в направлении флага
+                this.agent.act = {
+                    n: 'turn',
+                    v: fl.a
+                }
+                console.log('turn: ', fl.a)
+            } else {
+                // предлагается переходить к следующему действию, если расстояние до
+                // флага в маршруте движения меньше 3
+                if (fl.d < 3) {
+                    this.currAction++
+                    console.log('nextaction')
+                    return
+                }
+                // флаг находится близко = расстояние меньше 6, но больше 3
+                console.log('run')
+                this.agent.act = {
+                    n: 'dash',
+                    v: fl.d < 6  ? 50 : 100
+                }
+            }
+        } else if (action.act === "kick") {
+
+        }
     }
 
     getAllObjects(p) {
