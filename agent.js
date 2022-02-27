@@ -42,9 +42,11 @@ class Agent {
         if (this.run) { // Игра начата
             if (this.act) { // Есть команда от игрока
                 if (this.act.n === "kick") // Пнуть мяч
-                    this.socketSend(this.act.n, this.act.v + " 0")
-                else // Движение и поворот
                     this.socketSend(this.act.n, this.act.v)
+                else // Движение и поворот
+                {
+                    this.socketSend(this.act.n, this.act.v)
+                }
             }
             // if (this.playOn) {
             //     this.act = {n: "turn", v: this.v}
