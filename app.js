@@ -10,13 +10,10 @@ const rl = readline.createInterface({ // Чтение консоли
 })
 
 rl.question('Enter team name: ', teamName => {
-    rl.question('Enter v: ', v => {
-        if (v > 0) agent.setV(v)
-        require('./socket')(agent, teamName, VERSION) //Настройка сокета
-        rl.question('Enter coordinate x: ', x => {
-            rl.question('Enter coordinate y: ', y => {
-                agent.socketSend('move', `${x} ${y}`) // Размещение игрока на поле
-            })
+    require('./socket')(agent, teamName, VERSION) //Настройка сокета
+    rl.question('Enter coordinate x: ', x => {
+        rl.question('Enter coordinate y: ', y => {
+            agent.socketSend('move', `${x} ${y}`) // Размещение игрока на поле
         })
     })
 })

@@ -65,7 +65,7 @@ module.exports = {
         const maxY = 39
         const eps = 0.00001
 
-        if (x >= -maxX - eps && x <= maxX + eps && y >= -maxY - eps && y <= maxY + eps) { // Проверка лежит ли точка внутри поля
+        if (x >= -maxX-eps && x <= maxX+eps && y >= -maxY-eps && y <= maxY+eps) { // Проверка лежит ли точка внутри поля
             // Проверка на выполнение первоначальных условий системы
             b1 = Math.abs(d1 ** 2 - ((x - x1) ** 2 + (y - y1) ** 2)) < eps
             b2 = Math.abs(d2 ** 2 - ((x - x2) ** 2 + (y - y2) ** 2)) < eps
@@ -201,6 +201,18 @@ module.exports = {
         da1 = Math.sqrt(d1 ** 2 + da ** 2 - 2 * d1 * da * Math.cos(this.toRad(Math.abs(alpha1 - alphaa))))
 
         return this.coord2flags(da1, x1, y1, da, xa, ya)
+    },
+
+    parseNames(p) {
+        let objectsByName = {}
+        for (let i = 1; i < p.length; i++) {
+            value = p[i]
+            name = ""
+            for (let i of value.cmd.p)
+                name += i
+            objectsByName[name] = {d: value.p[0], a: value.p[1]}
+        }
+        return objectsByName
     },
 
     parseCoord(p) {
