@@ -218,7 +218,6 @@ module.exports = {
     parseCoord(p) {
         // Сохранияем в массив points координаты, расстояние и угол флагов в удобном виде
         let points = []
-        // В массив players сохраняем расстояние и угол объектов
         let obj = []
         for (let i = 1; i < p.length; i++) {
             value = p[i]
@@ -303,10 +302,11 @@ module.exports = {
                 break
             }
         }
+        console.log(obj)
         p = p.flags
 
         if (p.length === 2) { // Вычисление координат через 2 флага
-            coord = this.coordObj2flags(p[0].d, p[0].x, p[0].y, p[0].a, obj.d, playersX, playerY, 
+            coord = this.coordObj2flags(p[0].d, p[0].x, p[0].y, p[0].a, obj.d, playerX, playerY,
                 obj.a, p[1].d, p[1].x, p[1].y, p[1].a)
             return coord
         }
@@ -315,7 +315,7 @@ module.exports = {
 
         let coord = null
         if (!indexes) { // Если не получилось
-            coord = this.coordObj2flags(p[0].d, p[0].x, p[0].y, p[0].a, obj.d, playersX, playerY,
+            coord = this.coordObj2flags(p[0].d, p[0].x, p[0].y, p[0].a, obj.d, playerX, playerY,
                 obj.a, p[1].d, p[1].x, p[1].y, p[1].a)
         } else {
             coord = this.coordObj2flags(p[indexes[0]].d, p[indexes[0]].x, 

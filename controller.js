@@ -1,7 +1,8 @@
 const Msg = require("./msg")
 const coord = require("./coord")
 const Manager = require("./manager")
-const DT = require("./decisionTree3")
+const DT = require("./decisionTree2")
+const GoalieDT = require("./goalieDecisionTree")
 
 class Controller {
     constructor() {
@@ -54,7 +55,8 @@ class Controller {
         // }
 
         const parsedSee = coord.parseNames(p)
-        this.agent.act = this.manager.getAction(DT, parsedSee)
+        // this.agent.act = this.manager.getAction(DT, parsedSee)
+        this.agent.act = this.manager.getAction(GoalieDT, parsedSee)
         // this.analyzeAction(coords)
     }
 
