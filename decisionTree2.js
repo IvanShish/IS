@@ -1,10 +1,11 @@
 const FL = "flag", KI = "kick"
+const epsd = 4, epsa = 20
 const DT = {
 	state: {
 		next: 0,
-		sequence: [{act: FL, fl: "frb"}, {act: FL, fl: "flt"},
+		sequence: [{act: FL, fl: "gr"}, {act: FL, fl: "flt"},
 		{act: KI, fl: "b", goal: "gr"}],
-		position: null,
+		leaderPos: null,
 		canBeLeader: true,
 		defLeader: false,
 		command: null,
@@ -44,7 +45,7 @@ const DT = {
 	closeFlag: {
 		exec(mgr, state)
 		{if (state.canBeLeader) state.defLeader = true;
-		 state.next++; state.action = state.sequence[state.next]; console.log(state.defLeader)},
+		 state.next++; state.action = state.sequence[state.next]},
 		next: "goalVisible",
 	},
 	farGoal: {
@@ -94,13 +95,13 @@ const DT = {
 	},
 
 	calculateLeaderPosition: {
-		exec(mgr, state) {state.position = mgr.calculatePosition()},
+		exec(mgr, state) {state.leaderPos = mgr.calculatePosition()},
 		next: "checkLeaderNearFlag",
 	},
 	checkLeaderNearFlag: {
 		condition: (mgr, state) => 
-		Math.abs(state.action.fl.d - state.position.d) < epsd && 
-		Math.abs(state.action.fl.a - state.position.a) < epsa
+		Math.abs(mgr.getDistance(state.action.fl) - state.leaderPos.d) < epsd && 
+		Math.abs(mgr.getAngle(state.action.fl.a) - state.leaderPos.a) < epsa,
 		trueCond: "changeCanBeLeader",
 		falseCond: "checkTooClose",
 	},
@@ -109,8 +110,8 @@ const DT = {
 		next: "checkTooClose",
 	},
 	checkTooClose: {
-		condition: (mgr, state) => state.position.d < 1 &&
-		 Math.abs(state.position.a) < 40,
+		condition: (mgr, state) => state.leaderPos.d < 1 &&
+		 Math.abs(state.leaderPos.a) < 40,
 		trueCond: "closeRotate",
 		falseCond: "checkTooFar",
 	},
@@ -119,18 +120,18 @@ const DT = {
 		next: "sendCommand",
 	},
 	checkTooFar: {
-		condition: (mgr, state) => state.position.d > 10,
+		condition: (mgr, state) => state.leaderPos.d > 10,
 		trueCond: "checkAngleFar",
 		falseCond: "checkAngle",
 	},
 	checkAngleFar: {
-		condition: (mgr, state) => Math.abs(state.position.a) > 5,
+		condition: (mgr, state) => Math.abs(state.leaderPos.a) > 5,
 		trueCond: "farRotate",
 		falseCond: "farDash",
 	},
 	farRotate: {
 		exec(mgr, state) {state.command = {n: 'turn',
-		 v: state.position.a}},
+		 v: state.leaderPos.a}},
 		next: "sendCommand",
 	},
 	farDash: {
@@ -138,17 +139,17 @@ const DT = {
 		next: "sendCommand",
 	},
 	checkAngle: {
-		condition: (mgr, state) => state.position.a > 40 ||
-		state.position.a < 25,
+		condition: (mgr, state) => state.leaderPos.a > 40 ||
+		state.leaderPos.a < 25,
 		trueCond: "normalRotate",
 		falseCond: "checkMiddle",
 	},
 	normalRotate: {
-		exec(mgr, state) {state.command = {n: 'turn', v: state.position.a - 30}},
+		exec(mgr, state) {state.command = {n: 'turn', v: state.leaderPos.a - 30}},
 		next: "sendCommand",
 	},
 	checkMiddle: {
-		condition: (mgr, state) => state.position.d < 7,
+		condition: (mgr, state) => state.leaderPos.d < 7,
 		trueCond: "middleDash",
 		falseCond: "normalDash",
 	},
