@@ -2,7 +2,7 @@ const FL = "flag", KI = "kick"
 const DT = {
 	state: {
 		next: 0,
-		sequence: [{act: FL, fl: "frb"}, {act: FL, fl: "gl"},
+		sequence: [{act: FL, fl: "flb"}, {act: FL, fl: "frb"}, {act: FL, fl: "flt"},
 		{act: KI, fl: "b", goal: "gr"}],
 		command: null
 	},
@@ -17,7 +17,7 @@ const DT = {
 		falseCond: "rotate",
 	},
 	rotate: {
-		exec(mgr, state) { state.command = {n: "turn", v: "90"} },
+		exec(mgr, state) { state.command = {n: "turn", v: "90"}},
 		next: "sendCommand",
 	},
 	rootNext: {
@@ -26,7 +26,7 @@ const DT = {
 		falseCond: "ballSeek",
 	},
 	flagSeek: {
-		condition: (mgr, state) => 3 >
+		condition: (mgr, state) => 2 >
 		mgr.getDistance(state.action.fl),
 		trueCond: "closeFlag",
 		falseCond: "farGoal",
@@ -34,7 +34,7 @@ const DT = {
 	closeFlag: {
 		exec(mgr, state)
 		{state.next++; state.action = state.sequence[state.next]},
-		next: "rootNext",
+		next: "goalVisible",
 	},
 	farGoal: {
 		condition:

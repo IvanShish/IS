@@ -1,7 +1,7 @@
 const Msg = require("./msg")
 const coord = require("./coord")
 const Manager = require("./manager")
-const DT = require("./decisionTree2")
+const DT = require("./decisionTree3")
 
 class Controller {
     constructor() {

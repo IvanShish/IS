@@ -2,7 +2,7 @@ const FL = "flag", KI = "kick"
 const DT = {
 	state: {
 		next: 0,
-		sequence: [{act: FL, fl: "frb"}, {act: FL, fl: "gl"},
+		sequence: [{act: FL, fl: "frb"}, {act: FL, fl: "flt"},
 		{act: KI, fl: "b", goal: "gr"}],
 		position: null,
 		canBeLeader: true,
@@ -16,7 +16,7 @@ const DT = {
 	},
 	checkLeader: {
 		condition: (mgr, state) => state.defLeader || 
-		state.canBeLeader && mgr.numPlayers() === 0,
+		(state.canBeLeader && mgr.numPlayers() === 0),
 		trueCond: "goalVisible",
 		falseCond: "checkNumPlayers",
 	},
@@ -36,7 +36,7 @@ const DT = {
 		falseCond: "ballSeek",
 	},
 	flagSeek: {
-		condition: (mgr, state) => 3 >
+		condition: (mgr, state) => 1 >
 		mgr.getDistance(state.action.fl),
 		trueCond: "closeFlag",
 		falseCond: "farGoal",
@@ -44,8 +44,8 @@ const DT = {
 	closeFlag: {
 		exec(mgr, state)
 		{if (state.canBeLeader) state.defLeader = true;
-		 state.next++; state.action = state.sequence[state.next]},
-		next: "rootNext",
+		 state.next++; state.action = state.sequence[state.next]; console.log(state.defLeader)},
+		next: "goalVisible",
 	},
 	farGoal: {
 		condition:
@@ -98,8 +98,9 @@ const DT = {
 		next: "checkLeaderNearFlag",
 	},
 	checkLeaderNearFlag: {
-		condition: (mgr, state) => mgr.checkLeaderNearFlag(state.action.fl,
-			state.position),
+		condition: (mgr, state) => 
+		Math.abs(state.action.fl.d - state.position.d) < epsd && 
+		Math.abs(state.action.fl.a - state.position.a) < epsa
 		trueCond: "changeCanBeLeader",
 		falseCond: "checkTooClose",
 	},

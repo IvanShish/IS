@@ -18,7 +18,6 @@ class Manager {
 				return execute(dt, action.falseCond, mgr)
 			}
 			if(typeof action.command == "function") {
-				console.log(action.command(mgr, dt.state))
 				return action.command(mgr, dt.state)
 			}
 			throw new Error(`Unexpected node in DT: ${title}`)
@@ -61,12 +60,6 @@ class Manager {
 				return {d: this.p[i].d, a: this.p[i].a}
 			}
 		}
-	}
-
-	checkLeaderNearFlag(fl, pl) {
-		const epsd = 0.5
-		const epsa = 10
-		return Math.abs(fl.d - pl.d) < epsd && Math.abs(fl.a - pl.a) < epsa
 	}
 }
 
