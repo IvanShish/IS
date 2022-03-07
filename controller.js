@@ -55,8 +55,8 @@ class Controller {
         // }
 
         const parsedSee = coord.parseNames(p)
-        // this.agent.act = this.manager.getAction(DT, parsedSee)
-        this.agent.act = this.manager.getAction(GoalieDT, parsedSee)
+        this.agent.act = this.manager.getAction(DT, parsedSee)
+        // this.agent.act = this.manager.getAction(GoalieDT, parsedSee)
         // this.analyzeAction(coords)
     }
 

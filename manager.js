@@ -21,7 +21,7 @@ class Manager {
                 return execute(dt, action.falseCond, mgr)
             }
             if (typeof action.command == "function") {
-                console.log(action.command(mgr, dt.state))
+                // console.log(action.command(mgr, dt.state))
                 return action.command(mgr, dt.state)
             }
             throw new Error(`Unexpected node in DT: ${title}`)
@@ -33,7 +33,6 @@ class Manager {
     getVisible(fl) {
         const find_fl = this.p[fl]
         return !!find_fl;
-
     }
 
     getDistance(fl) {
@@ -88,7 +87,6 @@ class Manager {
     }
 
     getBallCoordinates() {
-        console.log(calculateObjCoord(this.p, 10, 10, "b"))
         return calculateObjCoord(this.p, 10, 10, "b")
     }
 }

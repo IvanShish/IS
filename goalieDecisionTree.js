@@ -1,4 +1,5 @@
-const BALL = "b", GOAL_FLAG = "gr", MAX_X = 35, MAX_Y = 20
+const BALL = "b", GOAL_FLAG = "gr", MAX_X = 35, MAX_Y = 20,
+    MIDFIELD_FLAG = "fprc"
 
 const GoalieDT = {
     state: {
@@ -9,7 +10,13 @@ const GoalieDT = {
         exec(mgr, state) {
             state.command = null
         },
-        next: "checkDistanceToBall"
+        next: "checkBall"
+    },
+
+    checkBall: {
+        condition: (mgr, state) => mgr.getVisible(BALL),
+        trueCond: "checkDistanceToBall",
+        falseCond: "farBall"
     },
 
     checkDistanceToBall: {
@@ -48,7 +55,17 @@ const GoalieDT = {
     checkCatch: {
         condition: (mgr, state) => mgr.getVisible(BALL) < 2,
         trueCond: "checkGoalZone",
-        falseCond: "turnToGoal"
+        falseCond: "turnToBall"
+    },
+
+    turnToBall: {
+        exec(mgr, state) {
+            state.command = {
+                n: 'turn',
+                v: mgr.getAngle(BALL)
+            }
+        },
+        next: "sendCommand"
     },
 
     checkGoalZone: {
@@ -77,7 +94,7 @@ const GoalieDT = {
     checkDistanceToGoal: {
         condition: (mgr, state) => mgr.getDistance(GOAL_FLAG) > 5,
         trueCond: "checkGoalAngle",
-        falseCond: "turnToBall"
+        falseCond: "closeGoal"
     },
 
     rotate: {
@@ -98,7 +115,7 @@ const GoalieDT = {
 
     runToGoal: {
         exec(mgr, state) {
-            state.command = {n: 'dash', v: 40}
+            state.command = {n: 'dash', v: 100}
         },
         next: "sendCommand"
     },
@@ -108,6 +125,22 @@ const GoalieDT = {
             state.command = {
                 n: 'turn',
                 v: mgr.getAngle(GOAL_FLAG)
+            }
+        },
+        next: "sendCommand"
+    },
+
+    closeGoal: {
+        condition: (mgr, state) => mgr.getVisible(MIDFIELD_FLAG),
+        trueCond: "turnToMidfield",
+        falseCond: "rotate"
+    },
+
+    turnToMidfield: {
+        exec(mgr, state) {
+            state.command = {
+                n: 'turn',
+                v: mgr.getAngle(MIDFIELD_FLAG)
             }
         },
         next: "sendCommand"
