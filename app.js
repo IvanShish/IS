@@ -11,9 +11,15 @@ const rl = readline.createInterface({ // Чтение консоли
 
 rl.question('Enter team name: ', teamName => {
     require('./socket')(agent, teamName, VERSION) //Настройка сокета
-    rl.question('Enter coordinate x: ', x => {
-        rl.question('Enter coordinate y: ', y => {
-            agent.socketSend('move', `${x} ${y}`) // Размещение игрока на поле
+    rl.question('Goalie? (y/n): ', isGk => {
+        if (isGk === 'y') {
+            agent.controller.setIsGk(true)
+        }
+        console.log(isGk)
+        rl.question('Enter coordinate x: ', x => {
+            rl.question('Enter coordinate y: ', y => {
+                agent.socketSend('move', `${x} ${y}`) // Размещение игрока на поле
+            })
         })
     })
 })

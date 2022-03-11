@@ -302,7 +302,9 @@ module.exports = {
                 break
             }
         }
-        console.log(obj)
+        if (!obj) {
+            return null;
+        }
         p = p.flags
 
         if (p.length === 2) { // Вычисление координат через 2 флага

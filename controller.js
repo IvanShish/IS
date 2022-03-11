@@ -1,21 +1,26 @@
 const Msg = require("./msg")
-const coord = require("./coord")
 const Manager = require("./manager")
 const DT = require("./decisionTree2")
 const GoalieDT = require("./goalieDecisionTree")
+// const coord = require("./coord")
 
 class Controller {
     constructor() {
         // this.actions = [{act: "flag", fl: "frb"}, {act: "flag", fl: "gl"}, 
         // {act: "flag", fl: "fc"}, {act: "kick", fl: "b", goal: "gr"}]
+        // this.currAction = 0
         this.manager = new Manager()
-        this.actions = [{act: "kick", fl: "b", goal: "gr"}]
-        this.currAction = 0
         this.agent = null
+        this.isGk = false
+        this.DT = null
     }
 
     setAgent(agent) {
         this.agent = agent
+    }
+
+    setIsGk(isGk) {
+        this.isGk = isGk
     }
 
     processMsg(msg) { // Обработка сообщения
@@ -30,6 +35,8 @@ class Controller {
     initAgent(p) {
         if (p[0] === "r") this.agent.position = "r" // Правая половина поля
         if (p[1]) this.agent.id = p[1] // id игрока
+        if (this.isGk) this.DT = GoalieDT
+        else this.DT = DT
     }
 
     analyzeHear(p) {
@@ -38,7 +45,7 @@ class Controller {
             this.agent.run = true
         } else if (p[2].startsWith("goal")) {
             this.agent.run = false
-            this.currAction = 0
+            // this.currAction = 0
         }
     }
 
@@ -53,11 +60,9 @@ class Controller {
         //     this.agent.xCoord = null
         //     this.agent.yCoord = null
         // }
-
-        const parsedSee = coord.parseNames(p)
-        this.agent.act = this.manager.getAction(DT, parsedSee)
-        // this.agent.act = this.manager.getAction(GoalieDT, parsedSee)
         // this.analyzeAction(coords)
+
+        this.agent.act = this.manager.getAction(this.DT, p)
     }
 
     // analyzeAction(objects) {

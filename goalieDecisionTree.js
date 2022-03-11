@@ -33,14 +33,27 @@ const GoalieDT = {
     },
 
     enemyGoalVisible: {
-        condition: (mgr, state) => mgr.getEnemyGoalVisible(),
-        trueCond: "kickBallToEnemyGoal",
-        falseCond: "rotateToEnemyGoal"
+        condition: (mgr, state) => mgr.getEnemyGoalVisible() && mgr.getDistance(BALL) <= 0.5,
+        trueCond: "kickBall",
+        falseCond: "checkRotateToEnemyGoal"
     },
 
-    kickBallToEnemyGoal: {
+    kickBall: {
         exec(mgr, state) {
             state.command = {n: "kick", v: `100 ${mgr.getEnemyGoalAngle()}`}
+        },
+        next: "sendCommand"
+    },
+
+    checkRotateToEnemyGoal: {
+        condition: (mgr, state) => mgr.getDistance(BALL) <= 0.5,
+        trueCond: "rotateToEnemyGoal",
+        falseCond: "runToBall"
+    },
+
+    runToBall: {
+        exec(mgr, state) {
+            state.command = {n: "dash", v: 100}
         },
         next: "sendCommand"
     },
@@ -53,7 +66,7 @@ const GoalieDT = {
     },
 
     checkCatch: {
-        condition: (mgr, state) => mgr.getVisible(BALL) < 2,
+        condition: (mgr, state) => mgr.getDistance(BALL) < 2,
         trueCond: "checkGoalZone",
         falseCond: "turnToBall"
     },
@@ -69,7 +82,7 @@ const GoalieDT = {
     },
 
     checkGoalZone: {
-        condition: (mgr, state) => mgr.getBallCoordinates().x < MAX_X &&
+        condition: (mgr, state) => mgr.getBallCoordinates().x > MAX_X &&
             mgr.getBallCoordinates().y < MAX_Y && mgr.getBallCoordinates().y > -MAX_Y,
         trueCond: "catchBall",
         falseCond: "enemyGoalVisible"
@@ -101,7 +114,7 @@ const GoalieDT = {
         exec(mgr, state) {
             state.command = {
                 n: 'turn',
-                v: 90
+                v: 60
             }
         },
         next: "sendCommand"
