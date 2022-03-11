@@ -1,6 +1,6 @@
 const Msg = require("./msg")
 const Manager = require("./manager")
-const DT = require("./decisionTree2")
+const DT = require("./decisionTree3")
 const GoalieDT = require("./goalieDecisionTree")
 // const coord = require("./coord")
 
