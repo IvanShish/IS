@@ -1,71 +1,81 @@
-const {calculateObjCoord} = require("./coord")
-
 class Manager {
-    constructor() {
-        this.p = null
-    }
+	constructor() {
+		this.p = null
+	}
 
-    getAction(dt, p) {
-        this.p = p
+	getAction(dt, p) {
+		this.p = p
+		function execute(dt, title, mgr) {
+			const action = dt[title]
+			if(typeof action.exec == "function") {
+				action.exec(mgr, dt.state)
+				return execute(dt, action.next, mgr)
+			}
+			if(typeof action.condition == "function") {
+				const cond = action.condition(mgr, dt.state)
+				if(cond)
+					return execute(dt, action.trueCond, mgr)
+				return execute(dt, action.falseCond, mgr)
+			}
+			if(typeof action.command == "function") {
+				return action.command(mgr, dt.state)
+			}
+			throw new Error(`Unexpected node in DT: ${title}`)
+		}
+		return execute(dt, "root", this)
+	}
 
-        function execute(dt, title, mgr) {
-            const action = dt[title]
-            if (typeof action.exec == "function") {
-                action.exec(mgr, dt.state)
-                return execute(dt, action.next, mgr)
-            }
-            if (typeof action.condition == "function") {
-                const cond = action.condition(mgr, dt.state)
-                if (cond)
-                    return execute(dt, action.trueCond, mgr)
-                return execute(dt, action.falseCond, mgr)
-            }
-            if (typeof action.command == "function") {
-                // console.log(action.command(mgr, dt.state))
-                return action.command(mgr, dt.state)
-            }
-            throw new Error(`Unexpected node in DT: ${title}`)
-        }
+	getVisible(fl) {
+		const find_fl = this.p[fl]
+		if (find_fl)
+			return true
+		return false
+	}
 
-        return execute(dt, "root", this)
-    }
+	getDistance(fl) {
+		const find_fl = this.p[fl]
+		if (find_fl)
+			return find_fl.d
+		return null
+	}
 
-    getVisible(fl) {
-        const find_fl = this.p[fl]
-        return !!find_fl;
-    }
+	getAngle(fl) {
+		const find_fl = this.p[fl]
+		if (find_fl)
+			return find_fl.a
+		return null
+	}
 
-    getDistance(fl) {
-        const find_fl = this.p[fl]
-        if (find_fl)
-            return find_fl.d
-        return null
-    }
+	numPlayers() {
+		let num = 0
+		for (let i in this.p) {
+			if (i[0] === 'p') num++;
+		}
+		return num
+	}
 
-    getAngle(fl) {
-        const find_fl = this.p[fl]
-        if (find_fl)
-            return find_fl.a
-        return null
-    }
+	calculatePosition() {
+		for (let i in this.p) {
+			if (i[0] === 'p') {
+				return {d: this.p[i].d, a: this.p[i].a}
+			}
+		}
+	}
 
-    numPlayers() {
-        let num = 0
-        for (let i in this.p) {
-            if (i[0] === 'p') num++;
-        }
-        return num
-    }
+	calculateMaxPosition() {
+		let maxd = 0, maxa
+		for (let i in this.p) {
+			if (i[0] === 'p') {
+				if (this.p[i].d > maxd) {
+					maxd = this.p[i].d
+					maxa = this.p[i].a
+				}
+			}
+		}
+		return {d: maxd, a: maxa}
+	}
 
-    calculatePosition() {
-        for (let i in this.p) {
-            if (i[0] === 'p') {
-                return {d: this.p[i].d, a: this.p[i].a}
-            }
-        }
-    }
-
-    getEnemyGoalVisible() {
+	getEnemyGoalVisible() {
         const find_gl = this.p["gl"]
         const find_flt = this.p["flt"]
         const find_flb = this.p["flb"]
