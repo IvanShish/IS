@@ -4,7 +4,8 @@ const BALL = "b", GOAL_FLAG = "gr", MAX_X = 35, MAX_Y = 20,
 const GoalieDT = {
     state: {
         command: null,
-        isBallCaught: false
+        isBallCaught: false,
+        sign: -1
     },
 
     root: {
@@ -21,7 +22,7 @@ const GoalieDT = {
     },
 
     checkDistanceToBall: {
-        condition: (mgr, state) => mgr.getDistance(BALL) < 9,
+        condition: (mgr, state) => mgr.getDistance(BALL) < 9 || mgr.isGoalieCloserToBall(),
         trueCond: "closeBall",
         falseCond: "farBall"
     },
@@ -56,9 +57,11 @@ const GoalieDT = {
         exec(mgr, state) {
             if (this.isBallCaught) {
                 this.isBallCaught = false
-                state.command = {n: 'turn', v: 45}
+                state.command = {n: 'turn', v: state.sign * 45}
             }
-            else state.command = {n: "kick", v: "5 45"}
+            else {
+                state.command = {n: "kick", v: "5 45"}
+            }
         },
         next: "sendCommand"
     },
@@ -77,6 +80,7 @@ const GoalieDT = {
 
     turnToBall: {
         exec(mgr, state) {
+            state.sign = mgr.getAngle(BALL) >= 0 ? 1 : -1
             state.command = {
                 n: 'turn',
                 v: mgr.getAngle(BALL)
@@ -127,7 +131,7 @@ const GoalieDT = {
         exec(mgr, state) {
             state.command = {
                 n: 'turn',
-                v: 60
+                v: state.sign * 60
             }
         },
         next: "sendCommand"
@@ -148,6 +152,7 @@ const GoalieDT = {
 
     turnToGoal: {
         exec(mgr, state) {
+            state.sign = mgr.getAngle(GOAL_FLAG) >= 0 ? 1 : -1
             state.command = {
                 n: 'turn',
                 v: mgr.getAngle(GOAL_FLAG)

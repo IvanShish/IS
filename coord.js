@@ -65,7 +65,7 @@ module.exports = {
         const maxY = 39
         const eps = 0.00001
 
-        if (x >= -maxX-eps && x <= maxX+eps && y >= -maxY-eps && y <= maxY+eps) { // Проверка лежит ли точка внутри поля
+        if (x >= -maxX - eps && x <= maxX + eps && y >= -maxY - eps && y <= maxY + eps) { // Проверка лежит ли точка внутри поля
             // Проверка на выполнение первоначальных условий системы
             b1 = Math.abs(d1 ** 2 - ((x - x1) ** 2 + (y - y1) ** 2)) < eps
             b2 = Math.abs(d2 ** 2 - ((x - x2) ** 2 + (y - y2) ** 2)) < eps
@@ -187,7 +187,7 @@ module.exports = {
         da2 = Math.sqrt(d2 ** 2 + da ** 2 - 2 * d2 * da * Math.cos(this.toRad(Math.abs(alpha2 - alphaa))))
 
         p = this.coord3flags(da1, x1, y1, da, xa, ya, da2, x2, y2)
-        if (p)
+        if (p.x && p.y)
             return p
         p = this.coordObj1flags(d1, x1, y1, alpha1, da, xa, ya, alphaa)
         if (p.length === 1)
@@ -225,7 +225,13 @@ module.exports = {
                 flagName = ""
                 for (let i of value.cmd.p)
                     flagName += i
-                points.push({x: Flags[flagName].x, y: Flags[flagName].y, d: value.p[0], a: value.p[1], flagName: flagName})
+                points.push({
+                    x: Flags[flagName].x,
+                    y: Flags[flagName].y,
+                    d: value.p[0],
+                    a: value.p[1],
+                    flagName: flagName
+                })
             } else {
                 objName = ""
                 for (let i of value.cmd.p)
@@ -239,25 +245,25 @@ module.exports = {
 
     selectFlags(p) {
         let indexes = null
-        let minDist = Infinity 
+        let minDist = Infinity
 
         // Перебираем флаги и находим 3 флага не на одной прямой и с минимальным расстоянием от игрока
         for (let i = 0; i < p.length; i++) {
-            for (let j = i+1; j < p.length; j++) {
-                for (let k = j+1; k < p.length; k++) {
-                    if (p[i].x != p[j].x && p[i].y != p[j].y && p[i].x != p[k].x && p[i].y != p[k].y && 
+            for (let j = i + 1; j < p.length; j++) {
+                for (let k = j + 1; k < p.length; k++) {
+                    if (p[i].x != p[j].x && p[i].y != p[j].y && p[i].x != p[k].x && p[i].y != p[k].y &&
                         p[j].x != p[k].x && p[j].y != p[j].k) {
-                        currentSum =  p[i].d + p[j].d + p[k].d
+                        currentSum = p[i].d + p[j].d + p[k].d
                         if (currentSum < minDist) {
                             minDist = currentSum
-                            indexes = [i,j,k]
+                            indexes = [i, j, k]
                         }
                     }
                 }
             }
         }
 
-        if (!indexes) 
+        if (!indexes)
             return null
         return indexes
     },
@@ -294,18 +300,20 @@ module.exports = {
 
     calculateObjCoord(p, playerX, playerY, objName) {
         p = this.parseCoord(p) // Преобразование в удобные значения
-        objects = p.obj
+        let objects = p.obj
         let obj = null
-        for (v of objects) {
+        for (let v of objects) {
             if (v.name === objName) {
                 obj = v
                 break
             }
+
         }
         if (!obj) {
             return null;
         }
         p = p.flags
+        let coord = null
 
         if (p.length === 2) { // Вычисление координат через 2 флага
             coord = this.coordObj2flags(p[0].d, p[0].x, p[0].y, p[0].a, obj.d, playerX, playerY,
@@ -315,16 +323,67 @@ module.exports = {
         // Есть минимум 3 флага
         let indexes = this.selectFlags(p) // Пытаемя найти 3 флага не на одной прямой
 
-        let coord = null
         if (!indexes) { // Если не получилось
             coord = this.coordObj2flags(p[0].d, p[0].x, p[0].y, p[0].a, obj.d, playerX, playerY,
                 obj.a, p[1].d, p[1].x, p[1].y, p[1].a)
         } else {
-            coord = this.coordObj2flags(p[indexes[0]].d, p[indexes[0]].x, 
-                p[indexes[0]].y, p[indexes[0]].a, obj.d, playerX, playerY, 
+            coord = this.coordObj2flags(p[indexes[0]].d, p[indexes[0]].x,
+                p[indexes[0]].y, p[indexes[0]].a, obj.d, playerX, playerY,
                 obj.a, p[indexes[1]].d, p[indexes[1]].x, p[indexes[1]].y, p[indexes[1]].a)
         }
 
         return coord
+    },
+
+    calculateClosestPlayerToBall(p, playerX, playerY) {
+        const notParsedP = p
+        p = this.parseCoord(p) // Преобразование в удобные значения
+        let objects = p.obj
+        let objs = []
+        for (let v of objects) {
+            if (v.name.startsWith("p")) {
+                objs.push(v)
+            }
+        }
+        if (objs.length === 0) {
+            return null;
+        }
+        p = p.flags
+        let coords = []
+
+        if (p.length === 2) { // Вычисление координат через 2 флага
+            for (let obj of objs) {
+                coords.push(this.coordObj2flags(p[0].d, p[0].x, p[0].y, p[0].a, obj.d, playerX, playerY,
+                    obj.a, p[1].d, p[1].x, p[1].y, p[1].a))
+            }
+            return coords
+        }
+        // Есть минимум 3 флага
+        let indexes = this.selectFlags(p) // Пытаемя найти 3 флага не на одной прямой
+
+        if (!indexes) { // Если не получилось
+            for (let obj of objs) {
+                coords.push(this.coordObj2flags(p[0].d, p[0].x, p[0].y, p[0].a, obj.d, playerX, playerY,
+                    obj.a, p[1].d, p[1].x, p[1].y, p[1].a))
+            }
+        } else {
+            for (let obj of objs) {
+                coords.push(this.coordObj2flags(p[indexes[0]].d, p[indexes[0]].x,
+                    p[indexes[0]].y, p[indexes[0]].a, obj.d, playerX, playerY,
+                    obj.a, p[indexes[1]].d, p[indexes[1]].x, p[indexes[1]].y, p[indexes[1]].a))
+            }
+        }
+
+        const ballCoords = this.calculateObjCoord(notParsedP, playerX, playerY, "b")
+
+        let closestPlayer = 1000
+        for (let pl of coords) {
+            const d = Math.sqrt((ballCoords.x - pl.x) ** 2 + (ballCoords.y - pl.y) ** 2)
+            if (d < closestPlayer) closestPlayer = d
+        }
+
+        let distanceToBall = Math.sqrt((ballCoords.x - playerX) ** 2 + (ballCoords.y - playerY) ** 2)
+
+        return closestPlayer > distanceToBall
     }
 }
