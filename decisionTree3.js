@@ -4,7 +4,7 @@ const DT = {
 	state: {
 		next: 0,
 		sequence: [{act: FL, fl: "frb"},
-		{act: KI, fl: "b", goal: "gr"}],
+			{act: KI, fl: "b", goal: "gr"}],
 		leaderPos: null,
 		canBeLeader: true,
 		defLeader: false,
@@ -13,7 +13,7 @@ const DT = {
 	},
 	root: {
 		exec(mgr, state) { state.action =
-		state.sequence[state.next]; state.command = null},
+			state.sequence[state.next]; state.command = null},
 		next: "checkDefLeader",
 	},
 	checkDefLeader: {
@@ -47,26 +47,26 @@ const DT = {
 		falseCond: "ballSeek",
 	},
 	flagSeek: {
-		condition: (mgr, state) => 1 >
-		mgr.getDistance(state.action.fl),
+		condition: (mgr, state) => 2 >
+			mgr.getDistance(state.action.fl),
 		trueCond: "closeFlag",
 		falseCond: "farGoal",
 	},
 	closeFlag: {
 		exec(mgr, state)
 		{if (state.canBeLeader) state.defLeader = true;
-		 state.next++; state.action = state.sequence[state.next]},
+			state.next++; state.action = state.sequence[state.next]},
 		next: "goalVisible",
 	},
 	farGoal: {
 		condition:
-		(mgr, state) => mgr.getAngle(state.action.fl) > 4,
+			(mgr, state) => Math.abs(mgr.getAngle(state.action.fl)) > 4,
 		trueCond: "rotateToGoal",
 		falseCond: "runToGoal",
 	},
 	rotateToGoal: {
 		exec(mgr, state) { state.command = {n: "turn", v:
-		mgr.getAngle(state.action.fl)} },
+				mgr.getAngle(state.action.fl)} },
 		next: "sendCommand",
 	},
 	runToGoal: {
@@ -78,19 +78,19 @@ const DT = {
 	},
 	ballSeek: {
 		condition:
-		(mgr, state) => 0.5 > mgr.getDistance(state.action.fl),
+			(mgr, state) => 0.5 > mgr.getDistance(state.action.fl),
 		trueCond: "closeBall",
 		falseCond: "farGoal",
 	},
 	closeBall: {
 		condition:
-		(mgr, state) => mgr.getVisible(state.action.goal),
+			(mgr, state) => mgr.getVisible(state.action.goal),
 		trueCond: "ballGoalVisible",
 		falseCond: "ballGoalInvisible",
 	},
 	ballGoalVisible: {
 		exec(mgr, state) { state.command =
-		{n: "kick", v: `100 ${mgr.getAngle(state.action.goal)}`}},
+			{n: "kick", v: `100 ${mgr.getAngle(state.action.goal)}`}},
 		next: "sendCommand",
 	},
 	ballGoalInvisible: {
@@ -104,9 +104,9 @@ const DT = {
 		next: "checkLeaderNearFlag",
 	},
 	checkLeaderNearFlag: {
-		condition: (mgr, state) => 
-		Math.abs(mgr.getDistance(state.action.fl) - state.leaderPos.d) < epsd && 
-		Math.abs(mgr.getAngle(state.action.fl.a) - state.leaderPos.a) < epsa,
+		condition: (mgr, state) =>
+			Math.abs(mgr.getDistance(state.action.fl) - state.leaderPos.d) < epsd &&
+			Math.abs(mgr.getAngle(state.action.fl.a) - state.leaderPos.a) < epsa,
 		trueCond: "changeCanBeLeader",
 		falseCond: "leftOrRight",
 	},
@@ -129,7 +129,7 @@ const DT = {
 	},
 	checkTooClose: {
 		condition: (mgr, state) => state.leaderPos.d < 1 &&
-		 Math.abs(state.leaderPos.a) < 40,
+			Math.abs(state.leaderPos.a) < 40,
 		trueCond: "closeRotate",
 		falseCond: "checkTooFar",
 	},
@@ -149,17 +149,16 @@ const DT = {
 	},
 	farRotate: {
 		exec(mgr, state) {state.command = {n: 'turn',
-		 v: state.leaderPos.a}},
+			v: state.leaderPos.a}},
 		next: "sendCommand",
 	},
 	farDash: {
-		exec(mgr, state) {state.command = {n: 'dash', v: 90}},
+		exec(mgr, state) {state.command = {n: 'dash', v: 80}},
 		next: "sendCommand",
 	},
 	checkAngle: {
-		condition: (mgr, state) => (state.sign === 1) ? (state.leaderPos.a > -state.sign*40 ||
-		state.leaderPos.a < -state.sign*25) : (state.leaderPos.a < -state.sign*40 ||
-		state.leaderPos.a > -state.sign*25),
+		condition: (mgr, state) => Math.abs(state.leaderPos.a) > 40 ||
+			Math.abs(state.leaderPos.a) < 25,
 		trueCond: "normalRotate",
 		falseCond: "checkMiddle",
 	},
