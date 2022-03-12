@@ -115,6 +115,11 @@ class Manager {
         if (coords) this.goaliePos = coords
         return this.goaliePos
     }
+
+    isGoalieCloserToBall() {
+        const goalieCoords = coord.calculatePlayerCoord(this.notParsedP)
+        return coord.calculateClosestPlayerToBall(this.notParsedP, goalieCoords.x, goalieCoords.y)
+    }
 }
 
 module.exports = Manager
