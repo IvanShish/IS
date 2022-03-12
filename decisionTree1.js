@@ -2,7 +2,7 @@ const FL = "flag", KI = "kick"
 const DT = {
 	state: {
 		next: 0,
-		sequence: [{act: FL, fl: "flb"}, {act: FL, fl: "frb"}, {act: FL, fl: "flt"},
+		sequence: [{act: FL, fl: "flb"}, {act: FL, fl: "frb"},
 		{act: KI, fl: "b", goal: "gr"}],
 		command: null
 	},
@@ -38,7 +38,7 @@ const DT = {
 	},
 	farGoal: {
 		condition:
-		(mgr, state) => mgr.getAngle(state.action.fl) > 4,
+		(mgr, state) => Math.abs(mgr.getAngle(state.action.fl)) > 4,
 		trueCond: "rotateToGoal",
 		falseCond: "runToGoal",
 	},

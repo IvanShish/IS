@@ -7,6 +7,7 @@ const Controller = require("./controller")
 class Agent {
     constructor() {
         this.position = "l" // По умолчанию - левая половина поля
+        this.teamName = null
         this.run = false // Игра начата
         this.playOn = false
         this.act = null // Действия

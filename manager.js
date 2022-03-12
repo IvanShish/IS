@@ -4,11 +4,13 @@ class Manager {
 	constructor() {
 		this.p = null
 		this.notParsedP = null
+		this.teamName = null
 	}
 
-	getAction(dt, p) {
+	getAction(dt, p, teamName) {
 		this.notParsedP = p
 		this.p = coord.parseNames(p)
+		this.teamName = teamName
 		function execute(dt, title, mgr) {
 			const action = dt[title]
 			if(typeof action.exec == "function") {
@@ -53,14 +55,14 @@ class Manager {
 	numPlayers() {
 		let num = 0
 		for (let i in this.p) {
-			if (i[0] === 'p') num++;
+			if (i[0] === 'p' && i.split('"')[1] === this.teamName) num++;
 		}
 		return num
 	}
 
 	calculatePosition() {
 		for (let i in this.p) {
-			if (i[0] === 'p') {
+			if (i[0] === 'p' && i.split('"')[1] === this.teamName) {
 				return {d: this.p[i].d, a: this.p[i].a}
 			}
 		}
@@ -69,7 +71,7 @@ class Manager {
 	calculateMaxPosition() {
 		let maxd = 0, maxa
 		for (let i in this.p) {
-			if (i[0] === 'p') {
+			if (i[0] === 'p' && i.split('"')[1] === this.teamName) {
 				if (this.p[i].d > maxd) {
 					maxd = this.p[i].d
 					maxa = this.p[i].a

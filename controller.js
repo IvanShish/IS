@@ -62,7 +62,7 @@ class Controller {
         // }
         // this.analyzeAction(coords)
 
-        this.agent.act = this.manager.getAction(this.DT, p)
+        this.agent.act = this.manager.getAction(this.DT, p, this.agent.teamName)
     }
 
     // analyzeAction(objects) {

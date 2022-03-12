@@ -3,7 +3,7 @@ const epsd = 3, epsa = 20
 const DT = {
 	state: {
 		next: 0,
-		sequence: [{act: FL, fl: "frb"}, {act: FL, fl: "flt"},
+		sequence: [{act: FL, fl: "frb"},
 		{act: KI, fl: "b", goal: "gr"}],
 		leaderPos: null,
 		canBeLeader: true,
@@ -52,7 +52,7 @@ const DT = {
 		falseCond: "ballSeek",
 	},
 	flagSeek: {
-		condition: (mgr, state) => 1 >
+		condition: (mgr, state) => 2 >
 		mgr.getDistance(state.action.fl),
 		trueCond: "closeFlag",
 		falseCond: "farGoal",
@@ -65,7 +65,7 @@ const DT = {
 	},
 	farGoal: {
 		condition:
-		(mgr, state) => mgr.getAngle(state.action.fl) > 4,
+		(mgr, state) => Math.abs(mgr.getAngle(state.action.fl)) > 4,
 		trueCond: "rotateToGoal",
 		falseCond: "runToGoal",
 	},
@@ -158,13 +158,12 @@ const DT = {
 		next: "sendCommand",
 	},
 	farDash: {
-		exec(mgr, state) {state.command = {n: 'dash', v: 90}},
+		exec(mgr, state) {state.command = {n: 'dash', v: 80}},
 		next: "sendCommand",
 	},
 	checkAngle: {
-		condition: (mgr, state) => (state.sign === 1) ? (state.leaderPos.a > -state.sign*40 ||
-		state.leaderPos.a < -state.sign*25) : (state.leaderPos.a < -state.sign*40 ||
-		state.leaderPos.a > -state.sign*25),
+		condition: (mgr, state) => Math.abs(state.leaderPos.a) > 40 ||
+		 Math.abs(state.leaderPos.a) < 25,
 		trueCond: "normalRotate",
 		falseCond: "checkMiddle",
 	},
