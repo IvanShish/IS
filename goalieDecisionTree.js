@@ -1,5 +1,5 @@
 const BALL = "b", GOAL_FLAG = "gr", MAX_X = 35, MAX_Y = 20,
-    MIDFIELD_FLAG = "fprc"
+    GOALIE_ZONE_X = 40, GOALIE_ZONE_Y = 9
 
 const GoalieDT = {
     state: {
@@ -48,14 +48,7 @@ const GoalieDT = {
     checkRotateToEnemyGoal: {
         condition: (mgr, state) => mgr.getDistance(BALL) <= 0.5,
         trueCond: "rotateToEnemyGoal",
-        falseCond: "runToBall"
-    },
-
-    runToBall: {
-        exec(mgr, state) {
-            state.command = {n: "dash", v: 100}
-        },
-        next: "sendCommand"
+        falseCond: "run"
     },
 
     rotateToEnemyGoal: {
@@ -101,13 +94,20 @@ const GoalieDT = {
     farBall: {
         condition: (mgr, state) => mgr.getVisible(GOAL_FLAG),
         trueCond: "checkDistanceToGoal",
-        falseCond: "rotate"
+        falseCond: "checkGoaliePos"
     },
 
     checkDistanceToGoal: {
         condition: (mgr, state) => mgr.getDistance(GOAL_FLAG) > 5,
         trueCond: "checkGoalAngle",
         falseCond: "closeGoal"
+    },
+
+    checkGoaliePos: {
+        condition: (mgr, state) => mgr.getGoaliePos().x > GOALIE_ZONE_X &&
+            -GOALIE_ZONE_Y < mgr.getGoaliePos().y < GOALIE_ZONE_X,
+        trueCond: "closeGoal",
+        falseCond: "rotate"
     },
 
     rotate: {
@@ -122,11 +122,11 @@ const GoalieDT = {
 
     checkGoalAngle: {
         condition: (mgr, state) => mgr.getAngle(GOAL_FLAG) < 4,
-        trueCond: "runToGoal",
+        trueCond: "run",
         falseCond: "turnToGoal"
     },
 
-    runToGoal: {
+    run: {
         exec(mgr, state) {
             state.command = {n: 'dash', v: 100}
         },
@@ -144,19 +144,9 @@ const GoalieDT = {
     },
 
     closeGoal: {
-        condition: (mgr, state) => mgr.getVisible(MIDFIELD_FLAG),
-        trueCond: "turnToMidfield",
+        condition: (mgr, state) => mgr.getVisible(BALL),
+        trueCond: "turnToBall",
         falseCond: "rotate"
-    },
-
-    turnToMidfield: {
-        exec(mgr, state) {
-            state.command = {
-                n: 'turn',
-                v: mgr.getAngle(MIDFIELD_FLAG)
-            }
-        },
-        next: "sendCommand"
     },
 
     sendCommand: {
