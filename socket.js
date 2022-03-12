@@ -11,6 +11,10 @@ module.exports = function (agent, teamName, version) {
             if (err) throw err
         })
     }
-    // Инициализация игрока на сервере (без параметра goalie)
-    socket.sendMsg(`(init ${teamName} (version ${version}))`)
+    // Инициализация игрока на сервере
+    if (agent.controller.isGk) {
+        socket.sendMsg(`(init ${teamName} (version ${version}) (goalie))`)
+    } else {
+        socket.sendMsg(`(init ${teamName} (version ${version}))`)
+    }
 }

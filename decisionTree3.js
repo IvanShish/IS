@@ -3,8 +3,9 @@ const epsd = 3, epsa = 20
 const DT = {
 	state: {
 		next: 0,
-		sequence: [{act: FL, fl: "frb"},
-			{act: KI, fl: "b", goal: "gr"}],
+		// sequence: [{act: FL, fl: "frb"},
+		// 	{act: KI, fl: "b", goal: "gr"}],
+		sequence: [{act: KI, fl: "b", goal: "gr"}],
 		leaderPos: null,
 		canBeLeader: true,
 		defLeader: false,

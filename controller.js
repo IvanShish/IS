@@ -43,10 +43,13 @@ class Controller {
         if (p[2] === "play_on") {
             this.agent.playOn = true
             this.agent.run = true
+            return
+        } else if (p[2].startsWith("goalie_catch_ball")) {
+            console.log("ball caught")
         } else if (p[2].startsWith("goal")) {
-            this.agent.run = false
-            // this.currAction = 0
+            console.log("goal")
         }
+        this.agent.run = false
     }
 
     analyzeSee(msg, cmd, p) { // Анализ сообщения

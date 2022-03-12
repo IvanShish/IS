@@ -3,7 +3,8 @@ const BALL = "b", GOAL_FLAG = "gr", MAX_X = 35, MAX_Y = 20,
 
 const GoalieDT = {
     state: {
-        command: null
+        command: null,
+        isBallCaught: false
     },
 
     root: {
@@ -20,7 +21,7 @@ const GoalieDT = {
     },
 
     checkDistanceToBall: {
-        condition: (mgr, state) => mgr.getDistance(BALL) < 7,
+        condition: (mgr, state) => mgr.getDistance(BALL) < 9,
         trueCond: "closeBall",
         falseCond: "farBall"
     },
@@ -53,14 +54,24 @@ const GoalieDT = {
 
     rotateToEnemyGoal: {
         exec(mgr, state) {
-            state.command = {n: "kick", v: "5 45"}
+            if (this.isBallCaught) {
+                this.isBallCaught = false
+                state.command = {n: 'turn', v: 45}
+            }
+            else state.command = {n: "kick", v: "5 45"}
         },
         next: "sendCommand"
     },
 
     checkCatch: {
-        condition: (mgr, state) => mgr.getDistance(BALL) < 2,
+        condition: (mgr, state) => mgr.getDistance(BALL) <= 1 && !this.isBallCaught,
         trueCond: "checkGoalZone",
+        falseCond: "checkIsBallAlreadyCaught"
+    },
+
+    checkIsBallAlreadyCaught: {
+        condition: (mgr, state) => this.isBallCaught,
+        trueCond: "enemyGoalVisible",
         falseCond: "turnToBall"
     },
 
@@ -83,6 +94,8 @@ const GoalieDT = {
 
     catchBall: {
         exec(mgr, state) {
+            // console.log('catch ', mgr.getAngle(BALL))
+            this.isBallCaught = true
             state.command = {
                 n: 'catch',
                 v: mgr.getAngle(BALL)
