@@ -5,7 +5,7 @@ const DT = {
 		next: 0,
 		// sequence: [{act: FL, fl: "frb"},
 		// 	{act: KI, fl: "b", goal: "gr"}],
-		sequence: [{act: KI, fl: "b", goal: "gr"}],
+		sequence: [{act: FL, fl: "frb"}, {act: KI, fl: "b", goal: "gr"}],
 		leaderPos: null,
 		canBeLeader: true,
 		defLeader: false,
@@ -144,13 +144,14 @@ const DT = {
 		falseCond: "checkAngle",
 	},
 	checkAngleFar: {
-		condition: (mgr, state) => Math.abs(state.leaderPos.a) > 5,
+		condition: (mgr, state) => Math.abs(state.leaderPos.a) > 15 || 
+		Math.abs(state.leaderPos.a) < 7,
 		trueCond: "farRotate",
 		falseCond: "farDash",
 	},
 	farRotate: {
 		exec(mgr, state) {state.command = {n: 'turn',
-			v: state.leaderPos.a}},
+			v: state.leaderPos.a + state.sign*10}},
 		next: "sendCommand",
 	},
 	farDash: {

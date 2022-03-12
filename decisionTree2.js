@@ -3,7 +3,7 @@ const epsd = 4, epsa = 20
 const DT = {
 	state: {
 		next: 0,
-		sequence: [{act: FL, fl: "frb"}, {act: FL, fl: "flb"},
+		sequence: [{act: FL, fl: "frb"}, {act: FL, fl: "flt"},
 		{act: KI, fl: "b", goal: "gr"}],
 		leaderPos: null,
 		canBeLeader: true,
@@ -125,13 +125,14 @@ const DT = {
 		falseCond: "checkAngle",
 	},
 	checkAngleFar: {
-		condition: (mgr, state) => Math.abs(state.leaderPos.a + state.sign*5) > 5,
+		condition: (mgr, state) => Math.abs(state.leaderPos.a) > 15 || 
+		Math.abs(state.leaderPos.a) < 7,
 		trueCond: "farRotate",
 		falseCond: "farDash",
 	},
 	farRotate: {
 		exec(mgr, state) {state.command = {n: 'turn',
-		 v: state.leaderPos.a + state.sign*5}},
+		 v: state.leaderPos.a - 10}},
 		next: "sendCommand",
 	},
 	farDash: {
