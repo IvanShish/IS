@@ -9,7 +9,7 @@ class Controller {
         // this.actions = [{act: "flag", fl: "frb"}, {act: "flag", fl: "gl"}, 
         // {act: "flag", fl: "fc"}, {act: "kick", fl: "b", goal: "gr"}]
         // this.currAction = 0
-        this.manager = new Manager()
+        this.manager = new Manager(this)
         this.agent = null
         this.isGk = false
         this.DT = null

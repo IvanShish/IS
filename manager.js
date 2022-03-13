@@ -1,10 +1,11 @@
 const coord = require('./coord')
 
 class Manager {
-    constructor() {
+    constructor(controller) {
         this.p = null
         this.notParsedP = null
         this.teamName = null
+        this.controller = controller
     }
 
     getAction(dt, p, teamName) {
@@ -107,7 +108,9 @@ class Manager {
 
     getBallCoordinates() {
         const playerCoords = coord.calculatePlayerCoord(this.notParsedP)
-        return coord.calculateObjCoord(this.notParsedP, playerCoords.x, playerCoords.y, "b")
+        const ballCoords = coord.calculateObjCoord(this.notParsedP, playerCoords.x, playerCoords.y, "b")
+        if (ballCoords) return ballCoords
+        else return {x: null, y: null}
     }
 
     getGoaliePos() {

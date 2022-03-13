@@ -376,6 +376,9 @@ module.exports = {
 
         const ballCoords = this.calculateObjCoord(notParsedP, playerX, playerY, "b")
 
+        if (!ballCoords) return false
+
+
         let closestPlayer = 1000
         for (let pl of coords) {
             const d = Math.sqrt((ballCoords.x - pl.x) ** 2 + (ballCoords.y - pl.y) ** 2)
