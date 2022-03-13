@@ -375,9 +375,7 @@ module.exports = {
         }
 
         const ballCoords = this.calculateObjCoord(notParsedP, playerX, playerY, "b")
-
-        if (!ballCoords) return false
-
+        if (!ballCoords) return null
 
         let closestPlayer = 1000
         for (let pl of coords) {
@@ -385,7 +383,16 @@ module.exports = {
             if (d < closestPlayer) closestPlayer = d
         }
 
-        let distanceToBall = Math.sqrt((ballCoords.x - playerX) ** 2 + (ballCoords.y - playerY) ** 2)
+        if (closestPlayer === 1000) return null
+        return closestPlayer
+    },
+
+    isPlayerCloserToBallThanAnyoneElse(p, playerX, playerY) {
+        const closestPlayer = this.calculateClosestPlayerToBall(p, playerX, playerY)
+        if (!closestPlayer) return false
+        const ballCoords = this.calculateObjCoord(p, playerX, playerY, "b")
+        if (!ballCoords) return false
+        const distanceToBall = Math.sqrt((ballCoords.x - playerX) ** 2 + (ballCoords.y - playerY) ** 2)
 
         return closestPlayer > distanceToBall
     }

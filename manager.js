@@ -16,7 +16,7 @@ class Manager {
         function execute(dt, title, mgr) {
             const action = dt[title]
             if (typeof action.exec == "function") {
-                console.log(title)
+                // console.log(title)
                 action.exec(mgr, dt.state)
                 return execute(dt, action.next, mgr)
             }
@@ -108,9 +108,10 @@ class Manager {
 
     getBallCoordinates() {
         const playerCoords = coord.calculatePlayerCoord(this.notParsedP)
+        if (!playerCoords) return {x: null, y: null}
         const ballCoords = coord.calculateObjCoord(this.notParsedP, playerCoords.x, playerCoords.y, "b")
         if (ballCoords) return ballCoords
-        else return {x: null, y: null}
+        return {x: null, y: null}
     }
 
     getGoaliePos() {
@@ -121,7 +122,14 @@ class Manager {
 
     isGoalieCloserToBall() {
         const goalieCoords = coord.calculatePlayerCoord(this.notParsedP)
-        return coord.calculateClosestPlayerToBall(this.notParsedP, goalieCoords.x, goalieCoords.y)
+        return coord.isPlayerCloserToBallThanAnyoneElse(this.notParsedP, goalieCoords.x, goalieCoords.y)
+    }
+
+    getClosestPlayerToBallDist() {
+        const goalieCoords = coord.calculatePlayerCoord(this.notParsedP)
+        const closestPlayer = coord.calculateClosestPlayerToBall(this.notParsedP, goalieCoords.x, goalieCoords.y)
+        if (closestPlayer) return closestPlayer
+        return 1000
     }
 }
 
