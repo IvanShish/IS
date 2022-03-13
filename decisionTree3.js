@@ -5,7 +5,7 @@ const DT = {
 		next: 0,
 		// sequence: [{act: FL, fl: "frb"},
 		// 	{act: KI, fl: "b", goal: "gr"}],
-		sequence: [{act: FL, fl: "frb"}, {act: KI, fl: "b", goal: "gr"}],
+		sequence: [{act: FL, fl: "flb"}, {act: KI, fl: "b", goal: "gr"}],
 		leaderPos: null,
 		canBeLeader: true,
 		defLeader: false,
@@ -86,12 +86,23 @@ const DT = {
 	closeBall: {
 		condition:
 			(mgr, state) => mgr.getVisible(state.action.goal),
-		trueCond: "ballGoalVisible",
+		trueCond: "checkGoalDist",
 		falseCond: "ballGoalInvisible",
 	},
-	ballGoalVisible: {
+	checkGoalDist: {
+		condition:
+			(mgr, state) => mgr.getDistance(state.action.goal) > 15,
+		trueCond: "ballGoalVisibleFar",
+		falseCond: "ballGoalVisibleClose",
+	},
+	ballGoalVisibleFar: {
 		exec(mgr, state) { state.command =
 			{n: "kick", v: `100 ${mgr.getAngle(state.action.goal)}`}},
+		next: "sendCommand",
+	},
+	ballGoalVisibleClose: {
+		exec(mgr, state) { state.command =
+			{n: "kick", v: `40 ${mgr.getAngle(state.action.goal)}`}},
 		next: "sendCommand",
 	},
 	ballGoalInvisible: {
