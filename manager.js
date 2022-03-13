@@ -16,7 +16,7 @@ class Manager {
         function execute(dt, title, mgr) {
             const action = dt[title]
             if (typeof action.exec == "function") {
-                // console.log(title)
+                console.log(title)
                 action.exec(mgr, dt.state)
                 return execute(dt, action.next, mgr)
             }

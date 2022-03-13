@@ -19,6 +19,7 @@ class Agent {
         this.v = null // Скорость вращения
         this.controller = new Controller()
         this.controller.setAgent(this)
+        this.audioGo = false
     }
 
     msgGot(msg) { // Получение сообщения
@@ -42,12 +43,12 @@ class Agent {
     sendCmd() {
         if (this.run) { // Игра начата
             if (this.act) { // Есть команда от игрока
-                if (this.act.n === "kick") // Пнуть мяч
-                    this.socketSend(this.act.n, this.act.v)
-                else // Движение и поворот
-                {
-                    this.socketSend(this.act.n, this.act.v)
-                }
+                this.socketSend(this.act.n, this.act.v)
+                // if (this.act.n === "kick") { // Пнуть мяч
+                //     this.socketSend(this.act.n, this.act.v)
+                // } else { // Движение и поворот
+                //     this.socketSend(this.act.n, this.act.v)
+                // }
             }
             // if (this.playOn) {
             //     this.act = {n: "turn", v: this.v}

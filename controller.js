@@ -2,6 +2,7 @@ const Msg = require("./msg")
 const Manager = require("./manager")
 const DT = require("./decisionTree3")
 const GoalieDT = require("./goalieDecisionTree")
+const scoringGoalDT = require("./scoringGoalDecisionTree")
 // const coord = require("./coord")
 
 class Controller {
@@ -36,7 +37,8 @@ class Controller {
         if (p[0] === "r") this.agent.position = "r" // Правая половина поля
         if (p[1]) this.agent.id = p[1] // id игрока
         if (this.isGk) this.DT = GoalieDT
-        else this.DT = DT
+        // else this.DT = DT
+        else this.DT = scoringGoalDT
     }
 
     analyzeHear(p) {
@@ -46,14 +48,18 @@ class Controller {
             return
         } else if (p[2].startsWith("goalie_catch_ball")) {
             console.log("ball caught")
-        } else if (p[2].startsWith("goal")) {
+        } else if (p[2].startsWith("goal_l") || p[2].startsWith("goal_r")) {
             console.log("goal")
+            this.agent.audioGo = false
+        } else if (p[2] === "\"go\"") {
+            console.log("go")
+            this.agent.audioGo = true
+            return
         }
         this.agent.run = false
     }
 
     analyzeSee(msg, cmd, p) { // Анализ сообщения
-        if (!this.agent.run) return
         // let xy = coord.calculatePlayerCoord(p) // Расчет координат игрока
         // if (xy && xy.x && xy.y) {
         //     this.agent.xCoord = xy.x
@@ -65,6 +71,7 @@ class Controller {
         // }
         // this.analyzeAction(coords)
 
+        // if (!this.agent.run) return
         this.agent.act = this.manager.getAction(this.DT, p, this.agent.teamName)
     }
 
