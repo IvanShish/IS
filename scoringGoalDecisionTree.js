@@ -19,13 +19,13 @@ const GoalieDT = {
     },
 
     checkPlayOn: {
-        condition: (mgr, state) => mgr.controller.agent.run,
+        condition: (mgr, state) => mgr.isPlayOn(),
         trueCond: "checkCurrentAct",
         falseCond: "isGoalScored"
     },
 
     isGoalScored: {
-        condition: (mgr, state) => !mgr.controller.agent.audioGo,
+        condition: (mgr, state) => mgr.wasGoalScored(),
         trueCond: "movePlayer",
         falseCond: "resetSequence"
     },
@@ -33,7 +33,8 @@ const GoalieDT = {
     movePlayer: {
         exec(mgr, state) {
             state.next = 0
-            state.command = {n: 'move', v: "-5 0"}
+            const coords = mgr.getAgentInitCoords()
+            state.command = {n: 'move', v: `${coords.x} ${coords.y}`}
         },
         next: "sendCommand"
     },
@@ -41,7 +42,6 @@ const GoalieDT = {
     resetSequence: {
         exec(mgr, state) {
             state.next = 0
-            state.command = {n: 'turn', v: 10}
         },
         next: "sendCommand"
     },
@@ -53,7 +53,7 @@ const GoalieDT = {
     },
 
     wasAudioMessageReceived: {
-        condition: (mgr, state) => mgr.controller.agent.audioGo,
+        condition: (mgr, state) => mgr.wasAudioGoReceived(),
         trueCond: "changeCurrentActToKick",
         falseCond: "flagVisible"
     },
@@ -61,7 +61,6 @@ const GoalieDT = {
     changeCurrentActToKick: {
         exec(mgr, state) {
             state.next = state.sequence.length - 1
-            state.command = {n: 'turn', v: 10}
         },
         next: "sendCommand"
     },
@@ -79,7 +78,7 @@ const GoalieDT = {
     },
 
     checkFlagAngle: {
-        condition: (mgr, state) => mgr.getAngle(state.action.fl) < 3,
+        condition: (mgr, state) => mgr.getAngle(state.action.fl) < 1,
         trueCond: "checkFlagDist",
         falseCond: "turnToFlag"
     },
@@ -100,7 +99,6 @@ const GoalieDT = {
     setNextAction: {
         exec(mgr, state) {
             state.next++
-            state.command = {n: 'turn', v: 10}
         },
         next: "sendCommand"
     },
@@ -120,7 +118,7 @@ const GoalieDT = {
     },
 
     checkDistToBallAndAngle: {
-        condition: (mgr, state) => mgr.getDistance(BALL) <= 0.5 && mgr.getAngle(BALL) < 4,
+        condition: (mgr, state) => mgr.getDistance(BALL) <= 0.5 && mgr.getAngle(BALL) < 1,
         trueCond: "enemyGoalVisible",
         falseCond: "checkBallAngle"
     },
@@ -149,7 +147,7 @@ const GoalieDT = {
     },
 
     checkBallAngle: {
-        condition: (mgr, state) => mgr.getAngle(BALL) < 4,
+        condition: (mgr, state) => mgr.getAngle(BALL) < 1,
         trueCond: "runToBall",
         falseCond: "turnToBall"
     },

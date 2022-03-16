@@ -15,9 +15,11 @@ rl.question('Enter team name: ', teamName => {
         if (isGk === 'y') {
             agent.controller.setIsGk(true)
         }
-        require('./socket')(agent, teamName, VERSION) //Настройка сокета
         rl.question('Enter coordinate x: ', x => {
             rl.question('Enter coordinate y: ', y => {
+                agent.xCoord = x
+                agent.yCoord = y
+                require('./socket')(agent, teamName, VERSION) //Настройка сокета
                 agent.socketSend('move', `${x} ${y}`) // Размещение игрока на поле
             })
         })

@@ -131,6 +131,22 @@ class Manager {
         if (closestPlayer) return closestPlayer
         return 1000
     }
+
+    isPlayOn() {
+        return this.controller.agent.run
+    }
+
+    wasAudioGoReceived() {
+        return this.controller.agent.audioGo
+    }
+
+    wasGoalScored() {
+        return this.controller.agent.goalScored
+    }
+
+    getAgentInitCoords() {
+        return {x: this.controller.agent.xCoord, y: this.controller.agent.yCoord}
+    }
 }
 
 module.exports = Manager

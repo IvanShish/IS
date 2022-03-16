@@ -45,12 +45,14 @@ class Controller {
         if (p[2] === "play_on") {
             this.agent.playOn = true
             this.agent.run = true
+            this.agent.goalScored = false
             return
         } else if (p[2].startsWith("goalie_catch_ball")) {
             console.log("ball caught")
         } else if (p[2].startsWith("goal_l") || p[2].startsWith("goal_r")) {
             console.log("goal")
             this.agent.audioGo = false
+            this.agent.goalScored = true
         } else if (p[2] === "\"go\"") {
             console.log("go")
             this.agent.audioGo = true
