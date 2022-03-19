@@ -65,7 +65,8 @@ module.exports = {
         const maxY = 39
         const eps = 0.00001
 
-        if (x >= -maxX - eps && x <= maxX + eps && y >= -maxY - eps && y <= maxY + eps) { // Проверка лежит ли точка внутри поля
+        // Проверка лежит ли точка внутри поля
+        if (x >= -maxX - eps && x <= maxX + eps && y >= -maxY - eps && y <= maxY + eps) { 
             // Проверка на выполнение первоначальных условий системы
             b1 = Math.abs(d1 ** 2 - ((x - x1) ** 2 + (y - y1) ** 2)) < eps
             b2 = Math.abs(d2 ** 2 - ((x - x2) ** 2 + (y - y2) ** 2)) < eps
@@ -102,6 +103,16 @@ module.exports = {
             goodPoints.push({x: x, y: y})
 
         return goodPoints
+    },
+
+    coord2flagsEqXgetY(d1, x1, y1, d2, x2, y2) {
+        y = (y2**2 - y1**2 + d1**2 - d2**2) / (2*(y2 - y1))
+        return y
+    },
+
+    coord2flagsEqYgetX(d1, x1, y1, d2, x2, y2) {
+        x = (x2**2 - x1**2 + d1**2 - d2**2) / (2*(x2 - x1))
+        return x
     },
 
     sqrtWithCheck(n) {
@@ -268,12 +279,40 @@ module.exports = {
         return indexes
     },
 
-    calculatePlayerCoord(p) {
-        p = this.parseCoord(p) // Преобразование в удобные значения
+    selectFlagsWithEq(p) {
+        let indexes = {eqX: null, eqY: null}
+        minDistX = Infinity
+        minDistY = Infinity
+
+        for (let i = 0; i < p.length; i++) {
+            if (p[i].d > 40) continue
+            for (let j = i+1; j < p.length; j++) {
+                if (p[j].d > 40) continue
+                if (p[i].x === p[j].x && p[i].y !== p[j].y) {
+                    currentSum = p[i].d + p[j].d
+                    if (currentSum < minDistX) {
+                        minDistX = currentSum
+                        indexes.eqX = [i, j]
+                    }
+                }
+                else if (p[i].y === p[j].y && p[i].x !== p[j].x) {
+                    currentSum = p[i].d + p[j].d
+                    if (currentSum < minDistY) {
+                        minDistY = currentSum
+                        indexes.eqY = [i, j]
+                    }
+                }
+            }
+        }
+        return indexes
+    },
+
+    calculatePlayerCoord(notParsedP) {
+        p = this.parseCoord(notParsedP) // Преобразование в удобные значения
         p = p.flags
 
         if (p.length < 2) { // Недостаточно флагов
-            return {flags: null, players: null}
+            return null
         }
 
         if (p.length === 2) { // Вычисление координат через 2 флага
@@ -286,20 +325,42 @@ module.exports = {
         }
 
         // Есть минимум 3 флага
-        let indexes = this.selectFlags(p) // Пытаемя найти 3 флага не на одной прямой
+        let resX, resY
 
-        if (!indexes) { // Если не получилось
-            coord = this.coord3flagsEqCoord(p[0].d, p[0].x, p[0].y, p[1].d, p[1].x, p[1].y, p[2].d, p[2].x, p[2].y)
-        } else {
-            coord = this.coord3flags(p[indexes[0]].d, p[indexes[0]].x, p[indexes[0]].y, p[indexes[1]].d,
-                p[indexes[1]].x, p[indexes[1]].y, p[indexes[2]].d, p[indexes[2]].x, p[indexes[2]].y)
+        let indexes = this.selectFlagsWithEq(p)
+        if (indexes.eqX) {
+            resY = this.coord2flagsEqXgetY(p[indexes.eqX[0]].d, p[indexes.eqX[0]].x, p[indexes.eqX[0]].y,
+             p[indexes.eqX[1]].d, p[indexes.eqX[1]].x, p[indexes.eqX[1]].y)
+        }
+        if (indexes.eqY) {
+            resX = this.coord2flagsEqYgetX(p[indexes.eqY[0]].d, p[indexes.eqY[0]].x, p[indexes.eqY[0]].y,
+             p[indexes.eqY[1]].d, p[indexes.eqY[1]].x, p[indexes.eqY[1]].y)
         }
 
-        return coord
+        if (!resX || !resY) {
+            indexes = this.selectFlags(p)
+            if (!indexes) { // Если не получилось
+                coord = this.coord3flagsEqCoord(p[0].d, p[0].x, p[0].y, p[1].d, p[1].x, p[1].y, p[2].d, p[2].x, p[2].y)
+                if (coord) {
+                    if (!resX) resX = coord.x
+                    if (!resY) resY = coord.y
+                }
+            }
+            else {
+                coord = this.coord3flags(p[indexes[0]].d, p[indexes[0]].x, p[indexes[0]].y, p[indexes[1]].d, 
+                    p[indexes[1]].x, p[indexes[1]].y, p[indexes[2]].d, p[indexes[2]].x, p[indexes[2]].y)
+                if (coord) {
+                    if (!resX) resX = coord.x
+                    if (!resY) resY = coord.y
+                }
+            }
+        }
+
+        return {x: resX, y: resY}
     },
 
-    calculateObjCoord(p, playerX, playerY, objName) {
-        p = this.parseCoord(p) // Преобразование в удобные значения
+    calculateObjCoord(notParsedP, playerX, playerY, objName) {
+        p = this.parseCoord(notParsedP) // Преобразование в удобные значения
         let objects = p.obj
         let obj = null
         for (let v of objects) {
@@ -307,37 +368,31 @@ module.exports = {
                 obj = v
                 break
             }
-
         }
         if (!obj) {
-            return null;
+            return null
         }
+
         p = p.flags
         let coord = null
 
-        if (p.length === 2) { // Вычисление координат через 2 флага
-            coord = this.coordObj2flags(p[0].d, p[0].x, p[0].y, p[0].a, obj.d, playerX, playerY,
-                obj.a, p[1].d, p[1].x, p[1].y, p[1].a)
+        if (p.length < 1) {
+            return null
+        }
+        else if (p.length === 1) { // Недостаточно флагов
+            coord = this.coordObj1flags(p[0].d, p[0].x, p[0].y, obj.a, pl[0].d, playerX, playerY, obj.a)
             return coord
         }
-        // Есть минимум 3 флага
-        let indexes = this.selectFlags(p) // Пытаемя найти 3 флага не на одной прямой
-
-        if (!indexes) { // Если не получилось
-            coord = this.coordObj2flags(p[0].d, p[0].x, p[0].y, p[0].a, obj.d, playerX, playerY,
-                obj.a, p[1].d, p[1].x, p[1].y, p[1].a)
-        } else {
-            coord = this.coordObj2flags(p[indexes[0]].d, p[indexes[0]].x,
-                p[indexes[0]].y, p[indexes[0]].a, obj.d, playerX, playerY,
-                obj.a, p[indexes[1]].d, p[indexes[1]].x, p[indexes[1]].y, p[indexes[1]].a)
+        else {
+            p.sort((x, y) => {return x.d > y.d})
+            coord = this.coordObj2flags(p[0].d, p[0].x, p[0].y, p[0].a, obj.d, playerX, playerY, obj.a,
+             p[1].d, p[1].x, p[1].y, p[1].a)
+            return coord
         }
-
-        return coord
     },
 
-    calculateClosestPlayerToBall(p, playerX, playerY) {
-        const notParsedP = p
-        p = this.parseCoord(p) // Преобразование в удобные значения
+    calculateClosestPlayerToBall(notParsedP, playerX, playerY) {
+        p = this.parseCoord(notParsedP) // Преобразование в удобные значения
         let objects = p.obj
         let objs = []
         for (let v of objects) {
@@ -346,32 +401,29 @@ module.exports = {
             }
         }
         if (objs.length === 0) {
-            return null;
+            return null
         }
         p = p.flags
         let coords = []
 
-        if (p.length === 2) { // Вычисление координат через 2 флага
+        if (p.length < 1) {
+            return null
+        }
+
+        if (p.length === 1) { // Вычисление координат через 2 флага
             for (let obj of objs) {
-                coords.push(this.coordObj2flags(p[0].d, p[0].x, p[0].y, p[0].a, obj.d, playerX, playerY,
-                    obj.a, p[1].d, p[1].x, p[1].y, p[1].a))
+                coords.push(this.coordObj1flags(p[0].d, p[0].x, p[0].y, p[0].a, 
+                    obj.d, playerX, playerY, obj.a))
             }
             return coords
         }
-        // Есть минимум 3 флага
-        let indexes = this.selectFlags(p) // Пытаемя найти 3 флага не на одной прямой
-
-        if (!indexes) { // Если не получилось
+        else {
+            p.sort((x, y) => {return x.d > y.d})
             for (let obj of objs) {
-                coords.push(this.coordObj2flags(p[0].d, p[0].x, p[0].y, p[0].a, obj.d, playerX, playerY,
-                    obj.a, p[1].d, p[1].x, p[1].y, p[1].a))
+                coords.push(this.coordObj2flags(p[0].d, p[0].x, p[0].y, p[0].a, obj.d, 
+                    playerX, playerY, obj.a, p[1].d, p[1].x, p[1].y, p[1].a))
             }
-        } else {
-            for (let obj of objs) {
-                coords.push(this.coordObj2flags(p[indexes[0]].d, p[indexes[0]].x,
-                    p[indexes[0]].y, p[indexes[0]].a, obj.d, playerX, playerY,
-                    obj.a, p[indexes[1]].d, p[indexes[1]].x, p[indexes[1]].y, p[indexes[1]].a))
-            }
+            return coords
         }
 
         const ballCoords = this.calculateObjCoord(notParsedP, playerX, playerY, "b")
