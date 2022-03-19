@@ -4,7 +4,7 @@ const GoalieDT = {
     state: {
         command: null,
         next: 0,
-        sequence: [{act: FL, fl: "fplb"},
+        sequence: [{act: FL, fl: "fplb"}, {act: FL, fl: "fgrb"},
             {act: KI, fl: BALL, goal: "gr"}],
         action: null,
         sign: 1

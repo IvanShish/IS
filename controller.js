@@ -1,7 +1,6 @@
 const Msg = require("./msg")
 const Manager = require("./manager")
-const DT = require("./decisionTree3")
-const GoalieDT = require("./goalieDecisionTree")
+const passDT = require("./decisionTreePass")
 const scoringGoalDT = require("./scoringGoalDecisionTree")
 // const coord = require("./coord")
 
@@ -12,7 +11,7 @@ class Controller {
         // this.currAction = 0
         this.manager = new Manager(this)
         this.agent = null
-        this.isGk = false
+        this.isSc = false
         this.DT = null
     }
 
@@ -20,8 +19,8 @@ class Controller {
         this.agent = agent
     }
 
-    setIsGk(isGk) {
-        this.isGk = isGk
+    setIsSc(isSc) {
+        this.isSc = isSc
     }
 
     processMsg(msg) { // Обработка сообщения
@@ -36,9 +35,9 @@ class Controller {
     initAgent(p) {
         if (p[0] === "r") this.agent.position = "r" // Правая половина поля
         if (p[1]) this.agent.id = p[1] // id игрока
-        if (this.isGk) this.DT = GoalieDT
+        if (this.isSc) this.DT = scoringGoalDT
         // else this.DT = DT
-        else this.DT = scoringGoalDT
+        else this.DT = passDT
     }
 
     analyzeHear(p) {

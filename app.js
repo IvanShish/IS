@@ -11,9 +11,9 @@ const rl = readline.createInterface({ // Чтение консоли
 
 rl.question('Enter team name: ', teamName => {
     agent.teamName = teamName
-    rl.question('Goalie? (y/n): ', isGk => {
-        if (isGk === 'y') {
-            agent.controller.setIsGk(true)
+    rl.question('Scorer? (y/n): ', isSc => {
+        if (isSc === 'y') {
+            agent.controller.setIsSc(true)
         }
         rl.question('Enter coordinate x: ', x => {
             rl.question('Enter coordinate y: ', y => {

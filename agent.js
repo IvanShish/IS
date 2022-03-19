@@ -42,34 +42,36 @@ class Agent {
     }
 
     sendCmd() {
-        if (this.act) {
-            this.socketSend(this.act.n, this.act.v)
+        if (this.run || this.act && this.act.n === 'move') {
+            if (this.act) {
+                this.socketSend(this.act.n, this.act.v)
+            }
+            this.act = null
+            // if (this.run) { // Игра начата
+            //     if (this.act) { // Есть команда от игрока
+            //         console.log(this.act)
+            //         this.socketSend(this.act.n, this.act.v)
+            //         // if (this.act.n === "kick") { // Пнуть мяч
+            //         //     this.socketSend(this.act.n, this.act.v)
+            //         // } else { // Движение и поворот
+            //         //     this.socketSend(this.act.n, this.act.v)
+            //         // }
+            //     }
+            //     // if (this.playOn) {
+            //     //     this.act = {n: "turn", v: this.v}
+            //     //     this.socketSend(this.act.n, this.act.v)
+            //     //     if (this.xCoord && this.yCoord) {
+            //     //         console.log("Координаты игрока:", this.xCoord.toFixed(2), this.yCoord.toFixed(2)) // Вывод расчитанных координат
+            //     //     } else {
+            //     //         console.log("Невозможно определить координаты игрока")
+            //     //     }
+            //     //     if (this.xCoordEnemy && this.yCoordEnemy) {
+            //     //         console.log("Координаты противника:", this.xCoordEnemy.toFixed(2), this.yCoordEnemy.toFixed(2))
+            //     //     }
+            //     // }
+            //     this.act = null // Сброс команды
+            // }
         }
-        this.act = null
-        // if (this.run) { // Игра начата
-        //     if (this.act) { // Есть команда от игрока
-        //         console.log(this.act)
-        //         this.socketSend(this.act.n, this.act.v)
-        //         // if (this.act.n === "kick") { // Пнуть мяч
-        //         //     this.socketSend(this.act.n, this.act.v)
-        //         // } else { // Движение и поворот
-        //         //     this.socketSend(this.act.n, this.act.v)
-        //         // }
-        //     }
-        //     // if (this.playOn) {
-        //     //     this.act = {n: "turn", v: this.v}
-        //     //     this.socketSend(this.act.n, this.act.v)
-        //     //     if (this.xCoord && this.yCoord) {
-        //     //         console.log("Координаты игрока:", this.xCoord.toFixed(2), this.yCoord.toFixed(2)) // Вывод расчитанных координат
-        //     //     } else {
-        //     //         console.log("Невозможно определить координаты игрока")
-        //     //     }
-        //     //     if (this.xCoordEnemy && this.yCoordEnemy) {
-        //     //         console.log("Координаты противника:", this.xCoordEnemy.toFixed(2), this.yCoordEnemy.toFixed(2))
-        //     //     }
-        //     // }
-        //     this.act = null // Сброс команды
-        // }
     }
 }
 
