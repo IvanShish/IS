@@ -78,7 +78,7 @@ const GoalieDT = {
     },
 
     checkFlagAngle: {
-        condition: (mgr, state) => mgr.getAngle(state.action.fl) < 1,
+        condition: (mgr, state) => Math.abs(mgr.getAngle(state.action.fl)) < 4,
         trueCond: "checkFlagDist",
         falseCond: "turnToFlag"
     },
@@ -118,7 +118,7 @@ const GoalieDT = {
     },
 
     checkDistToBallAndAngle: {
-        condition: (mgr, state) => mgr.getDistance(BALL) <= 0.5 && mgr.getAngle(BALL) < 1,
+        condition: (mgr, state) => mgr.getDistance(BALL) <= 0.5 && Math.abs(mgr.getAngle(BALL)) < 4,
         trueCond: "enemyGoalVisible",
         falseCond: "checkBallAngle"
     },
@@ -147,7 +147,7 @@ const GoalieDT = {
     },
 
     checkBallAngle: {
-        condition: (mgr, state) => mgr.getAngle(BALL) < 1,
+        condition: (mgr, state) => Math.abs(mgr.getAngle(BALL)) < 4,
         trueCond: "runToBall",
         falseCond: "turnToBall"
     },
