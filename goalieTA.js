@@ -1,11 +1,14 @@
-const MIN_X = 35, MAX_X = 52, MAX_Y = 20,
-    GOALIE_ZONE_X = 47, GOALIE_ZONE_Y = 7
+const MIN_X = 35, MAX_X = 52, MAX_Y = 20, GOALIE_ZONE_X = 47, GOALIE_ZONE_Y = 7
+const farDist = 12, closeDist = 2
 
 const GoalieTA = {
     state: { // Описание состояния
         current: "start", // Текущее состояние автомата
-        variables: {dist: null, lastBallAngle: 60, lastGoalAngle: 60}, // Переменные
-        timers: {t: 0, ballTimer: 0, goalTimer: 0}, // Таймеры
+        variables: {
+            dist: null, lastBallAngle: 60, // Переменные
+            lastGoalOwnAngle: 60, lastGoalAngle: 60
+        },
+        timers: {t: 0}, // Таймеры
         next: true, // Нужен переход на следующее состояние
         synch: undefined, // Текущее действие
         local: {}, // Внутренние переменные для методов
@@ -25,17 +28,17 @@ const GoalieTA = {
     edges: { /* Ребра автомата (имя каждого ребра указывает на
 узел-источник и узел-приемник) */
         start_close:
-            [{guard: [{s: "lt", l: {v: "dist"}, r: 2}]}],
+            [{guard: [{s: "lt", l: {v: "dist"}, r: closeDist}]}],
         /* Список guard описывает перечень условий, проверяемых
         * для перехода по ребру. Знак lt - меньше, lte - меньше
         * либо равно. В качестве параметров принимаются числа или
         * значения переменных "v" или таймеров "t" */
         start_near: [{
-            guard: [{s: "lt", l: {v: "dist"}, r: 10},
-                {s: "lte", l: 2, r: {v: "dist"}}]
+            guard: [{s: "lt", l: {v: "dist"}, r: farDist},
+                {s: "lte", l: closeDist, r: {v: "dist"}}]
         }],
         start_far:
-            [{guard: [{s: "lte", l: 10, r: {v: "dist"}}]}],
+            [{guard: [{s: "lte", l: farDist, r: {v: "dist"}}]}],
         close_catch: [{synch: "catch!"}],
         /* Событие синхронизации synch вызывает на выполнение
         * соответствующую функцию */
@@ -59,7 +62,7 @@ const GoalieTA = {
             }
         ],
         near_start: [{
-            synch: "empty!",
+            synch: "predict!",
             assign: [{n: "t", v: 0, type: "timer"}]
         }],
         near_intercept: [{synch: "canIntercept?"}],
@@ -76,16 +79,28 @@ const GoalieTA = {
             state.local.catch = 0
         },
         beforeAction(taken, state) { // Действие перед каждым вычислением
+            if (!state.local.ballTimer) state.local.ballTimer = 0
+            if (!state.local.goalOwnTimer) state.local.goalOwnTimer = 0
+            if (!state.local.goalTimer) state.local.goalTimer = 0
+
             if (taken.ball) {
                 state.variables.dist = taken.ball.dist
                 state.variables.lastBallAngle = taken.ball.angle
+                state.local.ballTimer = 0
             } else {
-                state.timers.ballTimer++
+                state.local.ballTimer++
             }
             if (taken.goalOwn) {
-                state.variables.lastGoalAngle = taken.goalOwn.angle
+                state.variables.lastGoalOwnAngle = taken.goalOwn.angle
+                state.local.goalOwnTimer = 0
             } else {
-                state.timers.goalTimer++
+                state.local.goalOwnTimer++
+            }
+            if (taken.goal) {
+                state.variables.lastGoalAngle = taken.goal.angle
+                state.local.goalTimer = 0
+            } else {
+                state.local.goalTimer++
             }
         },
         catch(taken, state) { // Ловим мяч
@@ -122,14 +137,18 @@ const GoalieTA = {
             else if (player) target = player
             if (target)
                 return {n: "kick", v: `${target.dist * 2 + 40} ${target.angle}`}
-            return {n: "kick", v: "10 45"}
+            let angle = 45
+            if (state.local.goalTimer <= 3) {
+                angle = state.variables.lastGoalAngle > 0 ? 45 : -45
+            }
+            return {n: "kick", v: `10 ${angle}`}
         },
         goBack(taken, state) { // Возврат к воротам
             state.next = false
             let goalOwn = taken.goalOwn
             if (!goalOwn) {
                 if (state.timers.goalTimer <= 3)
-                    return {n: "turn", v: state.variables.lastGoalAngle > 0 ? 100 : -100}
+                    return {n: "turn", v: state.variables.lastGoalOwnAngle > 0 ? 100 : -100}
                 return {n: "turn", v: 60}
             }
             if (Math.abs(goalOwn.angle) > 10)
@@ -176,7 +195,7 @@ const GoalieTA = {
             state.next = false
             let ball = taken.ball
             if (!ball) return this.goBack(taken, state)
-            if (ball.dist < 2) {
+            if (ball.dist < closeDist) {
                 state.next = true
                 return
             }
@@ -188,8 +207,20 @@ const GoalieTA = {
             state.next = true;
             return {n: "turn", v: 0}
         },
-        empty(taken, state) {  // Пустое действие
-            state.next = true
+        predict(taken, state) { // Предсказывание движения мяча
+            state.next = false;
+            if (!state.local.goalie || !taken.predictedPoint || !taken.playerCoords)
+                return {n: "turn", v: 0}
+            state.next = true;
+            const predictedPoint = taken.predictedPoint
+            const playerCoords = taken.playerCoords
+
+            if (Math.abs(predictedPoint - playerCoords.y) < closeDist) {
+                return this.runToBall(taken, state)
+            }
+
+            const angle = predictedPoint < playerCoords.y ? 90 : -90
+            return {n: "dash", v: `100 ${angle}`}
         }
     }
 }
