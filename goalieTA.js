@@ -85,20 +85,20 @@ const GoalieTA = {
             if (!state.local.goalTimer) state.local.goalTimer = 0
 
             if (taken.ball) {
-                state.variables.dist = taken.ball.dist
-                state.variables.lastBallAngle = taken.ball.angle
+                state.variables.dist = taken.ball.d
+                state.variables.lastBallAngle = taken.ball.a
                 state.local.ballTimer = 0
             } else {
                 state.local.ballTimer++
             }
             if (taken.goalOwn) {
-                state.variables.lastGoalOwnAngle = taken.goalOwn.angle
+                state.variables.lastGoalOwnAngle = taken.goalOwn.a
                 state.local.goalOwnTimer = 0
             } else {
                 state.local.goalOwnTimer++
             }
             if (taken.goal) {
-                state.variables.lastGoalAngle = taken.goal.angle
+                state.variables.lastGoalAngle = taken.goal.a
                 state.local.goalTimer = 0
             } else {
                 state.local.goalTimer++
@@ -110,8 +110,8 @@ const GoalieTA = {
                 state.next = true
                 return
             }
-            let angle = taken.ball.angle
-            let dist = taken.ball.dist
+            let angle = taken.ball.a
+            let dist = taken.ball.d
             state.next = false
             if (dist > 0.5) {
                 if (state.local.goalie) {
@@ -129,17 +129,17 @@ const GoalieTA = {
         kick(taken, state) { // Пинаем мяч
             state.next = true
             if (!taken.ball) return
-            let dist = taken.ball.dist
+            let dist = taken.ball.d
             if (dist > 0.5) return
             let goal = taken.goal
             let player = taken.teamOwn ? taken.teamOwn[0] : null
             let target
             if (goal && player)
-                target = goal.dist < player.dist ? goal : player
+                target = goal.d < player.d ? goal : player
             else if (goal) target = goal
             else if (player) target = player
             if (target)
-                return {n: "kick", v: `${target.dist * 2 + 40} ${target.angle}`}
+                return {n: "kick", v: `${target.d * 2 + 40} ${target.a}`}
             let angle = 45
             if (state.local.goalTimer <= 3) {
                 angle = state.variables.lastGoalAngle > 0 ? 45 : -45
@@ -155,13 +155,13 @@ const GoalieTA = {
                     return {n: "turn", v: state.variables.lastGoalOwnAngle > 0 ? 100 : -100}
                 return {n: "turn", v: 60}
             }
-            if (Math.abs(goalOwn.angle) > 10)
-                return {n: "turn", v: goalOwn.angle}
-            if (goalOwn.dist < 2) {
+            if (Math.abs(goalOwn.a) > 10)
+                return {n: "turn", v: goalOwn.a}
+            if (goalOwn.d < 2) {
                 state.next = true
                 return {n: "turn", v: 180}
             }
-            return {n: "dash", v: goalOwn.dist * 2 + 20}
+            return {n: "dash", v: goalOwn.d * 2 + 20}
         },
 
         lookAround(taken, state) { // Осматриваемся
@@ -195,19 +195,19 @@ const GoalieTA = {
             state.next = true
             if (!ball) return false
             if (!ballPrev) return true
-            return ball.dist <= ballPrev.dist + 0.5;
+            return ball.d <= ballPrev.d + 0.5;
         },
 
         runToBall(taken, state) { // Бежим к мячу
             state.next = false
             let ball = taken.ball
             if (!ball) return this.goBack(taken, state)
-            if (ball.dist < closeDist) {
+            if (ball.d < closeDist) {
                 state.next = true
                 return
             }
-            if (Math.abs(ball.angle) > 10)
-                return {n: "turn", v: ball.angle}
+            if (Math.abs(ball.a) > 10)
+                return {n: "turn", v: ball.a}
             return {n: "dash", v: 110}
         },
 
@@ -215,7 +215,7 @@ const GoalieTA = {
             state.next = true;
             let ball = taken.ball
             if (!ball) return {n: "turn", v: 0}
-            return {n: "turn", v: ball.angle}
+            return {n: "turn", v: ball.a}
         },
 
         predict(taken, state) { // Предсказывание движения мяча

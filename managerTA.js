@@ -1,4 +1,3 @@
-const goalieTA = require('./goalieTA')
 const Taken = require("./taken")
 const BEFORE_ACTION = "beforeAction"
 
