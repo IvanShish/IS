@@ -1,12 +1,15 @@
 const Msg = require("./msg")
 const Manager = require("./manager")
+const ManagerTA = require("./managerTA")
 const passDT = require("./decisionTreePass")
 const scoringGoalDT = require("./scoringGoalDecisionTree")
+const goalieTA = require("./goalieTA")
 // const coord = require("./coord")
 
 class Controller {
     constructor() {
-        this.manager = new Manager(this)
+        // this.manager = new Manager(this)
+        this.manager = new ManagerTA(this)
         this.agent = null
         this.isSc = false
         this.DT = null
