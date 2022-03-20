@@ -1,23 +1,21 @@
 const goalieTA = require('./goalieTA')
-const coord = require("./coord");
+const Taken = require("./taken")
 const BEFORE_ACTION = "beforeAction"
-const Manager = {
+
+class ManagerTA {
     constructor(controller) {
-        this.p = null
-        this.notParsedP = null
         this.teamName = null
         this.controller = controller
-    },
+    }
 
-    getAction(ta, p, teamName) { // Формирование действия
-        this.notParsedP = p
-        this.p = coord.parseNames(p)
+    getAction(ta, p, teamName, side) { // Формирование действия
         this.teamName = teamName
+        let taken = Taken.setSee(p, teamName, side)
         this.incTimers(taken, ta)
         if (ta.actions[BEFORE_ACTION])
             ta.actions[BEFORE_ACTION](taken, ta.state)
         return this.execute(taken, ta)
-    },
+    }
 
     incTimers(taken, ta) { // Увеличение таймеров
         if (!this.lastTime)
@@ -27,10 +25,11 @@ const Manager = {
             for (let key in ta.state.timers)
                 ta.state.timers[key] = ta.state.timers[key] + 1
         }
-    },
+    }
+
     execute(taken, ta) { // Формирование действия
         if (ta.state.synch) { // Если действие выполнено не до конца
-            let cond = ta.state.synch.substr(0, ta.state.synch.length - 1)
+            let cond = ta.state.synch.substring(0, ta.state.synch.length - 1)
             return ta.actions[cond](taken, ta.state)
         }
         if (ta.state.next) { // Переход на следующей действие
@@ -40,7 +39,8 @@ const Manager = {
         if (ta.nodes[ta.current]) return this.executeState(taken, ta)
         if (ta.edges[ta.current]) return this.executeEdge(taken, ta)
         throw `Unexpected state: ${ta.current}`
-    },
+    }
+
     nextState(taken, ta) { // Находимся в узле, нужен переход
         let node = ta.nodes[ta.current]
         for (let name of node.e) { // Перебираем ребра
@@ -60,7 +60,7 @@ const Manager = {
                 }
                 if (e.synch) { // Необходима синхронизация
                     if (e.synch.endsWith("?")) { // Проверка условия
-                        let cond = e.synch.substr(0, e.synch.length - 1)
+                        let cond = e.synch.substring(0, e.synch.length - 1)
                         if (!ta.actions[cond])
                             throw `Unexpected synch: ${e.synch}`
                         console.log(`Synch[${taken.time}]: ${e.synch}`)
@@ -73,14 +73,16 @@ const Manager = {
                 return this.execute(taken, ta) // Рекурсивный вызов
             }
         }
-    },
+    }
+
     nextEdge(taken, ta) { // Находимся в ребре, нужен переход
         let arr = ta.current.split("_")
 // После подчеркивания - имя узла, куда должны попасть
         ta.current = arr[1]
         ta.state.next = false
         return this.execute(taken, ta) // Рекурсивный вызов
-    },
+    }
+
     executeState(taken, ta) { // Выполнить действия в узле
         let node = ta.nodes[ta.current]
         if (ta.actions[node]) { // Если действие в узле есть
@@ -91,7 +93,8 @@ const Manager = {
             ta.state.next = true
             return this.execute(taken, ta) // Рекурсивный вызов
         }
-    },
+    }
+
     executeEdge(taken, ta) { // Выполнить действия в ребре
         let edges = ta.edges[ta.current]
         for (let e of edges) { // Может быть несколько ребер
@@ -121,31 +124,49 @@ const Manager = {
                 if (!e.synch.endsWith("?") && !e.synch.endsWith("!"))
                     throw `Unexpected synch: ${e.synch}`
                 if (e.synch.endsWith("!")) { // Выполнение действия
-                    let cond = e.synch.substr(0, e.synch.length - 1)
+                    let cond = e.synch.substring(0, e.synch.length - 1)
                     if (!ta.actions[cond])
                         throw `Unexpected synch: ${e.synch}`
-// Выполнение action
+                    // Выполнение action
                     return ta.actions[cond](taken, ta.state)
                 }
             }
         }
         ta.state.next = true // Действий нет, переход к узлу
         return this.execute(taken, ta) // Рекурсивный вызов
-    },
+    }
+
     guard(taken, ta, g) { // Проверка условий
         function taStateObject(o, ta) { /* Получение значения
-таймера/переменной (g.l или g.r) */
+        таймера/переменной (g.l или g.r) */
             if (typeof o == "object")
                 return o.v ? ta.state.variables[o.v] : ta.state.timers[o.t]
-        else
-            return o
+            else
+                return o
         }
 
         function lt(ta, l, r) { // Проверка неравенства
             return taStateObject(l, ta) < taStateObject(r, ta)
         }
 
-// TODO Проверка условий
+        function lte(ta, l, r) {
+            return taStateObject(l, ta) <= taStateObject(r, ta)
+        }
+
+        function gte(ta, l, r) {
+            return taStateObject(l, ta) >= taStateObject(r, ta)
+        }
+
+        function gt(ta, l, r) {
+            return taStateObject(l, ta) > taStateObject(r, ta)
+        }
+
+        function eq(ta, l, r) {
+            return taStateObject(l, ta) === taStateObject(r, ta)
+        }
+
         throw `Unexpected guard: ${JSON.stringify(g)}`
     }
 }
+
+module.exports = ManagerTA

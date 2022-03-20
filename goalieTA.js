@@ -73,6 +73,7 @@ const GoalieTA = {
             synch: "runToBall!", assign: [{n: "t", v: 0, type: "timer"}]
         }]
     },
+
     actions: {
         init(taken, state) { // Инициализация игрока
             state.local.goalie = true
@@ -103,6 +104,7 @@ const GoalieTA = {
                 state.local.goalTimer++
             }
         },
+
         catch(taken, state) { // Ловим мяч
             if (!taken.ball) {
                 state.next = true
@@ -123,6 +125,7 @@ const GoalieTA = {
             }
             state.next = true
         },
+
         kick(taken, state) { // Пинаем мяч
             state.next = true
             if (!taken.ball) return
@@ -143,6 +146,7 @@ const GoalieTA = {
             }
             return {n: "kick", v: `10 ${angle}`}
         },
+
         goBack(taken, state) { // Возврат к воротам
             state.next = false
             let goalOwn = taken.goalOwn
@@ -159,6 +163,7 @@ const GoalieTA = {
             }
             return {n: "dash", v: goalOwn.dist * 2 + 20}
         },
+
         lookAround(taken, state) { // Осматриваемся
             state.next = false
             state.synch = "lookAround!"
@@ -183,6 +188,7 @@ const GoalieTA = {
                     state.next = true
             }
         },
+
         canIntercept(taken, state) { // Можем добежать первыми
             let ball = taken.ball
             let ballPrev = taken.ballPrev
@@ -191,6 +197,7 @@ const GoalieTA = {
             if (!ballPrev) return true
             return ball.dist <= ballPrev.dist + 0.5;
         },
+
         runToBall(taken, state) { // Бежим к мячу
             state.next = false
             let ball = taken.ball
@@ -203,10 +210,14 @@ const GoalieTA = {
                 return {n: "turn", v: ball.angle}
             return {n: "dash", v: 110}
         },
-        ok(taken, state) { // Ничего делать не надо
+
+        ok(taken, state) { // Поворот к мячу, если его видно
             state.next = true;
-            return {n: "turn", v: 0}
+            let ball = taken.ball
+            if (!ball) return {n: "turn", v: 0}
+            return {n: "turn", v: ball.angle}
         },
+
         predict(taken, state) { // Предсказывание движения мяча
             state.next = false;
             if (!state.local.goalie || !taken.predictedPoint || !taken.playerCoords)
