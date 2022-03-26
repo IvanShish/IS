@@ -380,7 +380,7 @@ module.exports = {
             return null
         }
         else if (p.length === 1) { // Недостаточно флагов
-            coord = this.coordObj1flags(p[0].d, p[0].x, p[0].y, obj.a, pl[0].d, playerX, playerY, obj.a)
+            coord = this.coordObj1flags(p[0].d, p[0].x, p[0].y, p[0].a, obj.d, playerX, playerY, obj.a)
             return coord
         }
         else {

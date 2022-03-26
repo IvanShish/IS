@@ -3,7 +3,7 @@ const Manager = require("./manager")
 const ManagerTA = require("./managerTA")
 const passDT = require("./decisionTreePass")
 const scoringGoalDT = require("./scoringGoalDecisionTree")
-const goalieTA = require("./goalieTA")
+const goalieTA = require("./scorerTA")
 // const coord = require("./coord")
 
 class Controller {

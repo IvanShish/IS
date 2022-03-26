@@ -13,7 +13,8 @@ class ManagerTA {
         this.incTimers(taken, ta)
         if (ta.actions[BEFORE_ACTION])
             ta.actions[BEFORE_ACTION](taken, ta.state)
-        return this.execute(taken, ta)
+        let ex = this.execute(taken, ta)
+        return ex
     }
 
     incTimers(taken, ta) { // Увеличение таймеров
@@ -49,11 +50,12 @@ class ManagerTA {
             for (let e of edge) { // Проверяем все ребра
                 if (e.guard) { // Проверяем ограничения
                     let guard = true
-                    for (let g of e.guard)
+                    for (let g of e.guard) {
                         if (!this.guard(taken, ta, g)) {
                             guard = false
                             break // Ограничение не выполнено
                         }
+                    }
                     if (!guard) // Ребро нам не подходит
                         continue
                 }
@@ -109,12 +111,11 @@ class ManagerTA {
             if (e.assign) { // Есть назначения в ребре
                 for (let a of e.assign) {
                     if (a.type === "timer") { // Для таймеров
-                        console.log(ta.state.timers[a.n], a.n)
-                        if (!ta.state.timers[a.n])
+                        if (!ta.state.timers[a.n] && ta.state.timers[a.n] != 0)
                             throw `Unexpected timer: ${a}`
                         ta.state.timers[a.n] = a.v
                     } else { // Для переменных
-                        if (!ta.state.variables[a.n])
+                        if (!ta.state.variables[a.n] && ta.state.variables[a.n] != 0)
                             throw `Unexpected variable: ${a}`
                         ta.state.variables[a.n] = a.v
                     }
