@@ -4,8 +4,8 @@ const farDist = 12, closeDist = 2
 const GoalieTA = {
     state: { // Описание состояния
         current: "start", // Текущее состояние автомата
-        variables: {
-            dist: null, lastBallAngle: 60, // Переменные
+        variables: { // Переменные
+            dist: null, lastBallAngle: 60,
             lastGoalOwnAngle: 60, lastGoalAngle: 60
         },
         timers: {t: 0}, // Таймеры

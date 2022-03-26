@@ -31,7 +31,7 @@ class ManagerTA {
             let cond = ta.state.synch.substring(0, ta.state.synch.length - 1)
             return ta.actions[cond](taken, ta.state)
         }
-        if (ta.state.next) { // Переход на следующей действие
+        if (ta.state.next) { // Переход на следующее действие
             if (ta.nodes[ta.current]) return this.nextState(taken, ta)
             if (ta.edges[ta.current]) return this.nextEdge(taken, ta)
         } // Переход не нужен
@@ -109,6 +109,7 @@ class ManagerTA {
             if (e.assign) { // Есть назначения в ребре
                 for (let a of e.assign) {
                     if (a.type === "timer") { // Для таймеров
+                        console.log(ta.state.timers[a.n], a.n)
                         if (!ta.state.timers[a.n])
                             throw `Unexpected timer: ${a}`
                         ta.state.timers[a.n] = a.v
@@ -164,7 +165,25 @@ class ManagerTA {
             return taStateObject(l, ta) === taStateObject(r, ta)
         }
 
-        throw `Unexpected guard: ${JSON.stringify(g)}`
+        switch (g.s) {
+            case 'lt':
+                return lt(ta, g.l, g.r)
+                break
+            case 'lte':
+                return lte(ta, g.l, g.r)
+                break
+            case 'gte':
+                return gte(ta, g.l, g.r)
+                break
+            case 'gt':
+                return gt(ta, g.l, g.r)
+                break
+            case 'eq':
+                return eq(ta, g.l, g.r)
+                break
+            default:
+                throw `Unexpected guard: ${JSON.stringify(g)}`
+        }
     }
 }
 

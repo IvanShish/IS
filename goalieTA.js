@@ -2,8 +2,8 @@ const MIN_X = 35, MAX_X = 52, MAX_Y = 20, GOALIE_ZONE_X = 47, GOALIE_ZONE_Y = 7
 const farDist = 12, closeDist = 2
 
 const GoalieTA = {
+    current: "start", // Текущее состояние автомата
     state: { // Описание состояния
-        current: "start", // Текущее состояние автомата
         variables: {
             dist: null, lastBallAngle: 60, // Переменные
             lastGoalOwnAngle: 60, lastGoalAngle: 60
