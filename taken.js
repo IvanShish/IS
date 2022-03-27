@@ -14,20 +14,19 @@ const Taken = {
         const goalOwn = p[GOAL_OWN] ? p[GOAL_OWN] : null
         const goal = this.getEnemyGoal(p)
 
-        let ballPrev
-        if (!this.ballPrev) {
-            ballPrev = null
-            this.ballPrev = ball
+        if (!this.ballPrevTimer && this.ballPrevTimer !== 0) {
+            this.ballPrevTimer = 0
+        } else if (this.ballPrevTimer > 1) {
             this.ballPrevCoords = this.getBallCoords(notParsedP)
+            this.ballPrevTimer = 0
         } else {
-            ballPrev = this.ballPrev
-            this.ballPrev = null
+            this.ballPrevTimer++
         }
-        this.ballCoords = this.getBallCoords(p)
+        this.ballCoords = this.getBallCoords(notParsedP)
 
         const teamOwn = this.getTeamOwn(p, teamName)
         const playerCoords = this.getPlayerCoords(notParsedP)
-        const predictedPoint = this.getPredictedPoint(notParsedP)
+        const predictedPoint = this.getPredictedPoint()
         const closestPlayer = this.getClosestPlayerToBall(notParsedP)
 
         return {
@@ -67,14 +66,15 @@ const Taken = {
         return coord.calculateObjCoord(p, this.playerCoords.x, this.playerCoords.y, BALL)
     },
 
-    getPredictedPoint(p) {
+    getPredictedPoint() {
         const playerCoords = this.playerCoords
         const ballCoords = this.ballCoords
         if (!ballCoords || !this.ballPrevCoords) return null
         const eps = 2
         if (Math.abs(ballCoords.x - this.ballPrevCoords.x) < eps &&
-            Math.abs(ballCoords.y - this.ballPrevCoords.y) < eps)
-            return null
+            Math.abs(ballCoords.y - this.ballPrevCoords.y) < eps) {
+            return 1000
+        }
         const k = (ballCoords.y - this.ballPrevCoords.y) /
             (ballCoords.x - this.ballPrevCoords.x)
         const b = this.ballPrevCoords.y - k * this.ballPrevCoords.x
