@@ -14,6 +14,7 @@ class ManagerTA {
         if (ta.actions[BEFORE_ACTION])
             ta.actions[BEFORE_ACTION](taken, ta.state)
         let ex = this.execute(taken, ta)
+        // console.log(ex)
         return ex
     }
 

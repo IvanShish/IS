@@ -1,5 +1,5 @@
 const coord = require("./coord")
-let BALL = 'b', GOAL_OWN = 'gr', GOAL_ENEMY = ["gl", "flt", "flb"]
+let BALL = 'b', GOAL_OWN = 'gr', GOAL_ENEMY = ["gl", "fglt", "fglb"]
 
 const Taken = {
     setSee(p, teamName, side) {
@@ -7,7 +7,7 @@ const Taken = {
         p = coord.parseNames(p)
         if (side === 'l') {
             GOAL_OWN = 'gl'
-            GOAL_ENEMY = ["gr", "frt", "frb"]
+            GOAL_ENEMY = ["gr", "fgrt", "fgrb"]
         }
 
         const ball = p[BALL] ? p[BALL] : null
@@ -70,9 +70,12 @@ const Taken = {
         const playerCoords = this.playerCoords
         const ballCoords = this.ballCoords
         if (!ballCoords || !this.ballPrevCoords) return null
-        const eps = 2
+        const eps = 1
         if (Math.abs(ballCoords.x - this.ballPrevCoords.x) < eps &&
             Math.abs(ballCoords.y - this.ballPrevCoords.y) < eps) {
+            return 1000
+        }
+        if (ballCoords.x > playerCoords.x - eps) {
             return 1000
         }
         const k = (ballCoords.y - this.ballPrevCoords.y) /
