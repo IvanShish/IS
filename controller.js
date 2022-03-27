@@ -1,18 +1,13 @@
 const Msg = require("./msg")
-const Manager = require("./manager")
 const ManagerTA = require("./managerTA")
-const passDT = require("./decisionTreePass")
-const scoringGoalDT = require("./scoringGoalDecisionTree")
-const goalieTA = require("./scorerTA")
-// const coord = require("./coord")
+const goalieTA = require("./goalieTA")
+const scorerTA = require("./scorerTA")
 
 class Controller {
     constructor() {
-        // this.manager = new Manager(this)
         this.manager = new ManagerTA(this)
         this.agent = null
         this.isSc = false
-        // this.DT = null
         this.TA = null
     }
 
@@ -36,9 +31,8 @@ class Controller {
     initAgent(p) {
         if (p[0] === "r") this.agent.position = "r" // Правая половина поля
         if (p[1]) this.agent.id = p[1] // id игрока
-        // if (this.isSc) this.DT = scoringGoalDT
-        // else this.DT = passDT
-        this.TA = goalieTA
+        if (this.isSc) this.TA = scorerTA
+        else this.TA = goalieTA
     }
 
     analyzeHear(p) {

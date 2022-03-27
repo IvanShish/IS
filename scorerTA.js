@@ -1,12 +1,9 @@
-const MIN_X = 35, MAX_X = 52, MAX_Y = 20, GOALIE_ZONE_X = 47, GOALIE_ZONE_Y = 7
-const farDist = 12, closeDist = 2
-
-const GoalieTA = {
+const ScorerTA = {
     current: "start", // Текущее состояние автомата
     state: { // Описание состояния
         variables: { // Переменные
-            distBall: null, angle: null, lastBallAngle: 60,
-            lastGoalOwnAngle: 60, lastGoalAngle: 60
+            distBall: null, angle: null, distGr: null,
+            lastBallAngle: 60, lastGoalAngle: 60
         },
         timers: {t: 0}, // Таймеры
         next: true, // Нужен переход на следующее состояние
@@ -56,16 +53,15 @@ const GoalieTA = {
             synch: "rotateKick!"
         }],
         grVisible_start: [
-        {
-            guard: [{s: "gt", l: {v: "distGr"}, r: 30}],
-            synch: "powerKick!"
-        },
-        {
-            guard: [{s: "lte", l: {v: "distGr"}, r: 30}],
-            synch: "weakKick!"
-        }]
-
-
+            {
+                guard: [{s: "gt", l: {v: "distGr"}, r: 30}],
+                synch: "powerKick!"
+            },
+            {
+                guard: [{s: "lte", l: {v: "distGr"}, r: 30}],
+                synch: "weakKick!"
+            }
+        ]
     },
 
     actions: {
@@ -74,7 +70,6 @@ const GoalieTA = {
         },
         beforeAction(taken, state) { // Действие перед каждым вычислением
             if (!state.local.ballTimer) state.local.ballTimer = 0
-            if (!state.local.goalOwnTimer) state.local.goalOwnTimer = 0
             if (!state.local.goalTimer) state.local.goalTimer = 0
 
             if (taken.ball) {
@@ -85,14 +80,8 @@ const GoalieTA = {
             } else {
                 state.local.ballTimer++
             }
-            if (taken.goalOwn) {
-                state.variables.distGr = taken.goalOwn.d
-                state.variables.lastGoalOwnAngle = taken.goalOwn.a
-                state.local.goalOwnTimer = 0
-            } else {
-                state.local.goalOwnTimer++
-            }
             if (taken.goal) {
+                state.variables.distGr = taken.goal.d
                 state.variables.lastGoalAngle = taken.goal.a
                 state.local.goalTimer = 0
             } else {
@@ -123,7 +112,7 @@ const GoalieTA = {
 
         grVisible(taken, state) {
             state.next = true
-            return !!taken.goalOwn
+            return !!taken.goal
         },
 
         rotateKick(taken, state) {
@@ -133,16 +122,16 @@ const GoalieTA = {
 
         powerKick(taken, state) {
             state.next = true
-            const angle = taken.goalOwn.a
+            const angle = taken.goal.a
             return {n: "kick", v: `60 ${angle}`}
         },
 
         weakKick(taken, state) {
             state.next = true
-            const angle = taken.goalOwn.a
+            const angle = taken.goal.a
             return {n: "kick", v: `40 ${angle}`}
         },
     }
 }
 
-module.exports = GoalieTA
+module.exports = ScorerTA

@@ -22,6 +22,7 @@ const GoalieTA = {
         kick: {n: "kick", e: ["start"]},
         far: {n: "far", e: ["start"]},
         near: {n: "near", e: ["intercept", "start"]},
+        predict: {n: "predict", e: ["start"]},
         intercept: {n: "intercept", e: ["start"]},
     },
 
@@ -44,9 +45,7 @@ const GoalieTA = {
         * соответствующую функцию */
         catch_kick: [{synch: "kick!"}],
         kick_start: [{
-            synch: "goBack!", assign: [{
-                n: "t", v: 0, type: "timer"
-            }]
+            synch: "goBack!", assign: [{n: "t", v: 0, type: "timer"}]
         }],
         /* Список assign перечисляет присваивания для переменных
         * "variable" и таймеров "timer" */
@@ -61,11 +60,12 @@ const GoalieTA = {
                 synch: "ok!"
             }
         ],
+        // near_predict: [{synch: "predict!"}],
+        near_intercept: [{synch: "canIntercept?"}],
         near_start: [{
             synch: "predict!",
             assign: [{n: "t", v: 0, type: "timer"}]
         }],
-        near_intercept: [{synch: "canIntercept?"}],
         /* Событие синхронизации synch может вызывать
         * соответствующую функцию для проверки возможности перехода
         * по ребру (заканчивается на знак "?") */
@@ -116,10 +116,12 @@ const GoalieTA = {
             if (dist > 0.5) {
                 if (state.local.goalie) {
                     if (state.local.catch < 3) {
+                        console.log('catch')
                         state.local.catch++
                         return {n: "catch", v: angle}
                     } else state.local.catch = 0
                 }
+                console.log(124)
                 if (Math.abs(angle) > 15) return {n: "turn", v: angle}
                 return {n: "dash", v: 20}
             }
@@ -138,6 +140,7 @@ const GoalieTA = {
                 target = goal.d < player.d ? goal : player
             else if (goal) target = goal
             else if (player) target = player
+            console.log(target)
             if (target)
                 return {n: "kick", v: `${target.d * 2 + 40} ${target.a}`}
             let angle = 45
@@ -191,11 +194,11 @@ const GoalieTA = {
 
         canIntercept(taken, state) { // Можем добежать первыми
             let ball = taken.ball
-            let ballPrev = taken.ballPrev
+            let closestPlayerToBall = taken.closestPlayerToBall
             state.next = true
             if (!ball) return false
-            if (!ballPrev) return true
-            return ball.d <= ballPrev.d + 0.5;
+            if (!closestPlayerToBall) return true
+            return ball.d <= closestPlayerToBall.d + 0.5;
         },
 
         runToBall(taken, state) { // Бежим к мячу
@@ -206,8 +209,11 @@ const GoalieTA = {
                 state.next = true
                 return
             }
-            if (Math.abs(ball.a) > 10)
+            if (Math.abs(ball.a) > 10) {
+                console.log(212)
                 return {n: "turn", v: ball.a}
+            }
+            console.log(215)
             return {n: "dash", v: 110}
         },
 
@@ -220,17 +226,21 @@ const GoalieTA = {
 
         predict(taken, state) { // Предсказывание движения мяча
             state.next = false;
-            if (!state.local.goalie || !taken.predictedPoint || !taken.playerCoords)
+            if (!state.local.goalie || !taken.predictedPoint || !taken.playerCoords) {
+                console.log(226)
                 return {n: "turn", v: 0}
+            }
             state.next = true;
             const predictedPoint = taken.predictedPoint
             const playerCoords = taken.playerCoords
 
             if (Math.abs(predictedPoint - playerCoords.y) < closeDist) {
+                console.log(234)
                 return this.runToBall(taken, state)
             }
 
             const angle = predictedPoint < playerCoords.y ? 90 : -90
+            console.log(239)
             return {n: "dash", v: `100 ${angle}`}
         }
     }

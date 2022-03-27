@@ -415,37 +415,16 @@ module.exports = {
                 coords.push(this.coordObj1flags(p[0].d, p[0].x, p[0].y, p[0].a, 
                     obj.d, playerX, playerY, obj.a))
             }
-            return coords
-        }
-        else {
+        } else {
             p.sort((x, y) => {return x.d > y.d})
             for (let obj of objs) {
                 coords.push(this.coordObj2flags(p[0].d, p[0].x, p[0].y, p[0].a, obj.d, 
                     playerX, playerY, obj.a, p[1].d, p[1].x, p[1].y, p[1].a))
             }
-            return coords
         }
 
-        const ballCoords = this.calculateObjCoord(notParsedP, playerX, playerY, "b")
-        if (!ballCoords) return null
-
-        let closestPlayer = 1000
-        for (let pl of coords) {
-            const d = Math.sqrt((ballCoords.x - pl.x) ** 2 + (ballCoords.y - pl.y) ** 2)
-            if (d < closestPlayer) closestPlayer = d
-        }
-
-        if (closestPlayer === 1000) return null
-        return closestPlayer
-    },
-
-    isPlayerCloserToBallThanAnyoneElse(p, playerX, playerY) {
-        const closestPlayer = this.calculateClosestPlayerToBall(p, playerX, playerY)
-        if (!closestPlayer) return false
-        const ballCoords = this.calculateObjCoord(p, playerX, playerY, "b")
-        if (!ballCoords) return false
-        const distanceToBall = Math.sqrt((ballCoords.x - playerX) ** 2 + (ballCoords.y - playerY) ** 2)
-
-        return closestPlayer > distanceToBall
+        if (!coords || coords.length === 0) return null
+        coords.sort((x, y) => {return x.d - y.d})
+        return coords[0]
     }
 }

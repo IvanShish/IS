@@ -5,7 +5,7 @@ const Taken = {
     setSee(p, teamName, side) {
         const notParsedP = p;
         p = coord.parseNames(p)
-        if (side === 'r') {
+        if (side === 'l') {
             GOAL_OWN = 'gl'
             GOAL_ENEMY = ["gr", "frt", "frb"]
         }
@@ -23,13 +23,15 @@ const Taken = {
             ballPrev = this.ballPrev
             this.ballPrev = null
         }
+        this.ballCoords = this.getBallCoords(p)
 
         const teamOwn = this.getTeamOwn(p, teamName)
         const playerCoords = this.getPlayerCoords(notParsedP)
         const predictedPoint = this.getPredictedPoint(notParsedP)
+        const closestPlayer = this.getClosestPlayerToBall(notParsedP)
 
         return {
-            ball: ball, goalOwn: goalOwn, goal: goal, ballPrev: ballPrev,
+            ball: ball, goalOwn: goalOwn, goal: goal, closestPlayerToBall: closestPlayer,
             teamOwn: teamOwn, playerCoords: playerCoords, predictedPoint: predictedPoint
         }
     },
@@ -67,7 +69,7 @@ const Taken = {
 
     getPredictedPoint(p) {
         const playerCoords = this.playerCoords
-        const ballCoords = this.getBallCoords(p)
+        const ballCoords = this.ballCoords
         if (!ballCoords || !this.ballPrevCoords) return null
         const eps = 2
         if (Math.abs(ballCoords.x - this.ballPrevCoords.x) < eps &&
@@ -77,6 +79,15 @@ const Taken = {
             (ballCoords.x - this.ballPrevCoords.x)
         const b = this.ballPrevCoords.y - k * this.ballPrevCoords.x
         return k * playerCoords.x + b
+    },
+
+    getClosestPlayerToBall(p) {
+        if (!this.playerCoords) return null
+        const closestPlayer = coord.calculateClosestPlayerToBall(p, this.playerCoords.x, this.playerCoords.y)
+        const ballCoords = this.ballCoords
+        if (!closestPlayer || !ballCoords) return null
+        const d = Math.sqrt((ballCoords.x - closestPlayer.x) ** 2 + (ballCoords.y - closestPlayer.y) ** 2)
+        return {d: d}
     }
 }
 

@@ -64,7 +64,7 @@ class ManagerTA {
                         let cond = e.synch.substring(0, e.synch.length - 1)
                         if (!ta.actions[cond])
                             throw `Unexpected synch: ${e.synch}`
-                        console.log(`Synch[${taken.time}]: ${e.synch}`)
+                        // console.log(`Synch[${taken.time}]: ${e.synch}`)
                         if (!ta.actions[cond](taken, ta.state))
                             continue // Проверка не успешна
                     }
