@@ -60,7 +60,6 @@ const GoalieTA = {
                 synch: "ok!"
             }
         ],
-        // near_predict: [{synch: "predict!"}],
         near_intercept: [{synch: "canIntercept?"}],
         near_start: [{
             synch: "predict!",
@@ -108,20 +107,23 @@ const GoalieTA = {
         catch(taken, state) { // Ловим мяч
             if (!taken.ball) {
                 state.next = true
+                console.log('catch !taken.ball')
                 return
             }
             let angle = taken.ball.a
             let dist = taken.ball.d
             state.next = false
             if (dist > 0.5) {
-                if (state.local.catch < 3 && dist < closeDist) {
-                    console.log('catch')
-                    state.local.catch++
-                    return {n: "catch", v: angle}
-                } else if (state.local.catch >= 3) state.local.catch = 0
-                if (Math.abs(angle) > 15) return {n: "turn", v: angle}
-                console.log('dash to ball')
-                return {n: "dash", v: 20}
+                return {n: "catch", v: angle}
+                // console.log(117, ', ', state.local.catch)
+                // if (state.local.catch < 3) {
+                //     console.log('catch')
+                //     state.local.catch++
+                //     return {n: "catch", v: angle}
+                // } else state.local.catch = 0
+                // if (Math.abs(angle) > 15) return {n: "turn", v: angle}
+                // console.log('dash to ball')
+                // return {n: "dash", v: 5}
             }
             console.log("catch dist <= 0.5")
             state.next = true
@@ -181,23 +183,25 @@ const GoalieTA = {
             state.next = false
             state.synch = "lookAround!"
             console.log("lookAround ", state.local.look)
+            state.next = true
+            // return {n: "turn", v: 60}
             if (!state.local.look)
                 state.local.look = "left"
             switch (state.local.look) {
                 case "left":
                     state.local.look = "center";
-                    return {n: "turn", v: -60}
+                    return {n: "turn", v: 90}
                 case "center":
                     state.local.look = "right";
-                    return {n: "turn", v: 60}
+                    return {n: "turn", v: 90}
                 case "right":
                     state.local.look = "back";
-                    return {n: "turn", v: 60}
+                    return {n: "turn", v: 90}
                 case "back":
                     state.local.look = "left"
                     state.next = true
                     state.synch = undefined
-                    return {n: "turn", v: -60}
+                    return {n: "turn", v: 90}
                 default:
                     state.next = true
             }
@@ -223,7 +227,6 @@ const GoalieTA = {
             let ball = taken.ball
             if (!ball) {
                 if (state.local.ballTimer <= 3) {
-                    state.next = true
                     const angle = state.variables.lastGoalAngle > 0 ? 45 : -45
                     return {n: "turn", v: angle}
                 }
@@ -243,8 +246,12 @@ const GoalieTA = {
         ok(taken, state) { // Поворот к мячу, если его He видно
             state.next = false
             const playerCoords = taken.playerCoords
-            if (!playerCoords) return this.lookAround(taken, state)
+            if (!playerCoords) {
+                console.log('252 lookAround')
+                return this.lookAround(taken, state)
+            }
             if (playerCoords.x < GOALIE_ZONE_X ||
+                playerCoords.x > 53 ||
                 playerCoords.y < -GOALIE_ZONE_Y ||
                 playerCoords.y > GOALIE_ZONE_Y) {
                 return this.goBack(taken, state)
@@ -256,6 +263,7 @@ const GoalieTA = {
                     const angle = state.variables.lastGoalAngle > 0 ? 45 : -45
                     return {n: "turn", v: angle}
                 }
+                console.log("267 lookAround")
                 return this.lookAround(taken, state)
             }
             state.next = true
@@ -266,7 +274,7 @@ const GoalieTA = {
         predict(taken, state) { // Предсказывание движения мяча
             state.next = true
             const predictedPoint = taken.predictedPoint
-            console.log("predict")
+            console.log("predict: ", predictedPoint)
             if (!predictedPoint || !taken.playerCoords) {
                 const ball = taken.ball
                 if (!ball) return {n: "turn", v: 60}

@@ -1,5 +1,5 @@
 const coord = require("./coord")
-let BALL = 'b', GOAL_OWN = 'gr', GOAL_ENEMY = ["gl", "fglt", "fglb"]
+let BALL = ['b', 'B'], GOAL_OWN = 'gr', GOAL_ENEMY = ["gl", "fglt", "fglb"]
 
 const Taken = {
     setSee(p, teamName, side) {
@@ -10,7 +10,15 @@ const Taken = {
             GOAL_ENEMY = ["gr", "fgrt", "fgrb"]
         }
 
-        const ball = p[BALL] ? p[BALL] : null
+        let ball
+        if (p[BALL[0]]) {
+            ball = p[BALL[0]]
+        } else if (p[BALL[1]]) {
+            ball = p[BALL[1]]
+        } else {
+            ball = null
+        }
+        console.log("ball: ", ball)
         const goalOwn = p[GOAL_OWN] ? p[GOAL_OWN] : null
         const goal = this.getEnemyGoal(p)
 
@@ -64,7 +72,11 @@ const Taken = {
 
     getBallCoords(p) {
         if (!this.playerCoords) return null
-        return coord.calculateObjCoord(p, this.playerCoords.x, this.playerCoords.y, BALL)
+        let ball = coord.calculateObjCoord(p, this.playerCoords.x, this.playerCoords.y, BALL[0])
+        if (!ball) {
+            ball = coord.calculateObjCoord(p, this.playerCoords.x, this.playerCoords.y, BALL[1])
+        }
+        return ball
     },
 
     getPredictedPoint() {
