@@ -7,8 +7,8 @@ class Controller {
     constructor() {
         this.manager = new ManagerTA(this)
         this.agent = null
-        this.isSc = false
         this.TA = null
+        this.isSc
     }
 
     setAgent(agent) {
@@ -31,7 +31,7 @@ class Controller {
     initAgent(p) {
         if (p[0] === "r") this.agent.position = "r" // Правая половина поля
         if (p[1]) this.agent.id = p[1] // id игрока
-        if (this.isSc) this.TA = scorerTA
+        if (this.agent.controller.isSc) this.TA = scorerTA
         else this.TA = goalieTA
     }
 

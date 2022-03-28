@@ -54,11 +54,11 @@ const ScorerTA = {
         }],
         grVisible_start: [
             {
-                guard: [{s: "gt", l: {v: "distGr"}, r: 30}],
+                guard: [{s: "gt", l: {v: "distGr"}, r: 35}],
                 synch: "powerKick!"
             },
             {
-                guard: [{s: "lte", l: {v: "distGr"}, r: 30}],
+                guard: [{s: "lte", l: {v: "distGr"}, r: 35}],
                 synch: "weakKick!"
             }
         ]
@@ -96,6 +96,9 @@ const ScorerTA = {
 
         rotate(taken, state) { // Поворот, если не видно мяча
             state.next = true
+            if (state.variables.lastBallAngle && state.variables.lastBallAngle < 0) {
+                return {n: "turn", v: -60}
+            }
             return {n: "turn", v: 60}
         },
 
@@ -117,19 +120,22 @@ const ScorerTA = {
 
         rotateKick(taken, state) {
             state.next = true
+            if (state.variables.lastGoalAngle && state.variables.lastGoalAngle < 0) {
+                return {n: "kick", v: `10 -45`}
+            }
             return {n: "kick", v: `10 45`}
         },
 
         powerKick(taken, state) {
             state.next = true
             const angle = taken.goal.a
-            return {n: "kick", v: `60 ${angle}`}
+            return {n: "kick", v: `20 ${angle}`}
         },
 
         weakKick(taken, state) {
             state.next = true
             const angle = taken.goal.a
-            return {n: "kick", v: `40 ${angle}`}
+            return {n: "kick", v: `70 ${angle}`}
         },
     }
 }

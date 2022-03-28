@@ -1,5 +1,4 @@
-const farDist = 15, closeDist = 1.8, GOALIE_ZONE_X = 47,
-    GOALIE_ZONE_Y = 8
+const farDist = 12, closeDist = 1
 
 const GoalieTA = {
     current: "start", // Текущее состояние автомата
@@ -85,7 +84,7 @@ const GoalieTA = {
             if (!state.local.goalTimer) state.local.goalTimer = 0
 
             if (taken.ball) {
-                state.variables.dist = Math.abs(taken.ball.d)
+                state.variables.dist = taken.ball.d
                 state.variables.lastBallAngle = taken.ball.a
                 state.local.ballTimer = 0
             } else {
@@ -114,13 +113,12 @@ const GoalieTA = {
             let dist = taken.ball.d
             state.next = false
             if (dist > 0.5) {
-                if (state.local.catch < 3 && dist < closeDist) {
+                if (state.local.catch < 3) {
                     console.log('catch')
                     state.local.catch++
                     return {n: "catch", v: angle}
                 } else state.local.catch = 0
                 if (Math.abs(angle) > 15) return {n: "turn", v: angle}
-                console.log('dash to ball')
                 return {n: "dash", v: 20}
             }
             state.next = true
@@ -162,7 +160,7 @@ const GoalieTA = {
                 state.next = true
                 return {n: "turn", v: 180}
             }
-            return {n: "dash", v: 100}
+            return {n: "dash", v: goalOwn.d * 2 + 20}
         },
 
         lookAround(taken, state) { // Осматриваемся
@@ -212,42 +210,32 @@ const GoalieTA = {
             return {n: "dash", v: 110}
         },
 
-        ok(taken, state) { // Поворот к мячу, если его He видно
-            state.next = false
-            const playerCoords = taken.playerCoords
-            if (!playerCoords) return this.lookAround(taken, state)
-            if (playerCoords.x < GOALIE_ZONE_X ||
-                playerCoords.y < -GOALIE_ZONE_Y ||
-                playerCoords.y > GOALIE_ZONE_Y) {
-                return this.goBack(taken, state)
-            }
+        ok(taken, state) { // Поворот к мячу, если его видно
+            state.next = true;
             const ball = taken.ball
-            if (!ball) return this.lookAround(taken, state)
-            state.next = true
+            if (!ball) return {n: "turn", v: 0}
             return {n: "turn", v: ball.a}
         },
 
         predict(taken, state) { // Предсказывание движения мяча
-            state.next = true
+            state.next = false;
             const predictedPoint = taken.predictedPoint
-            // console.log(predictedPoint)
             if (!predictedPoint || !taken.playerCoords) {
+                console.log(225)
                 const ball = taken.ball
                 if (!ball) return {n: "turn", v: 60}
-                if (ball.d < closeDist) {
-                    state.next = false
-                    return this.runToBall(taken, state)
-                }
                 return {n: "turn", v: ball.a}
             }
+            state.next = true;
             const playerCoords = taken.playerCoords
 
             if (predictedPoint === 1000 || Math.abs(predictedPoint - playerCoords.y) < closeDist) {
-                state.next = false
+                console.log(232)
                 return this.runToBall(taken, state)
             }
 
             const angle = predictedPoint < playerCoords.y ? 90 : -90
+            console.log(237)
             return {n: "dash", v: `100 ${angle}`}
         }
     }
