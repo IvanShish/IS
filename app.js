@@ -18,8 +18,12 @@ rl.question('Enter team name: ', teamName => {
             rl.question('Enter coordinate y: ', y => {
                 agent.xCoord = x
                 agent.yCoord = y
-                require('./socket')(agent, teamName, VERSION) //Настройка сокета
-                agent.socketSend('move', `${x} ${y}`) // Размещение игрока на поле
+                const settings = require('./socket')
+                settings(agent, teamName, VERSION).then(() => {
+                    agent.socketSend('move', `${x} ${y}`)
+                })
+                // require('./socket')(agent, teamName, VERSION) //Настройка сокета
+                // agent.socketSend('move', `${x} ${y}`) // Размещение игрока на поле
             })
         })
     })
