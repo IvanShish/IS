@@ -28,10 +28,11 @@ const Taken = {
         const playerCoords = this.getPlayerCoords(notParsedP)
         const predictedPoint = this.getPredictedPoint()
         const closestPlayer = this.getClosestPlayerToBall(notParsedP)
+        const goalForScorer = this.getGoalForScorer(p)
 
         return {
             ball: ball, goalOwn: goalOwn, goal: goal, closestPlayerToBall: closestPlayer,
-            teamOwn: teamOwn, playerCoords: playerCoords, predictedPoint: predictedPoint
+            teamOwn: teamOwn, playerCoords: playerCoords, predictedPoint: predictedPoint, goalForScorer: goalForScorer
         }
     },
 
@@ -91,6 +92,18 @@ const Taken = {
         if (!closestPlayer || !ballCoords) return null
         const d = Math.sqrt((ballCoords.x - closestPlayer.x) ** 2 + (ballCoords.y - closestPlayer.y) ** 2)
         return {d: d}
+    },
+
+    getGoalForScorer(p) {
+        const gr = p[GOAL_ENEMY[0]]
+        if (gr)
+            return gr
+        let v
+        for (let i in p) {
+            if (i.startsWith('p'))
+                v = p[i]
+        }
+        return v
     }
 }
 

@@ -80,9 +80,9 @@ const ScorerTA = {
             } else {
                 state.local.ballTimer++
             }
-            if (taken.goal) {
-                state.variables.distGr = taken.goal.d
-                state.variables.lastGoalAngle = taken.goal.a
+            if (taken.goalForScorer) {
+                state.variables.distGr = taken.goalForScorer.d
+                state.variables.lastGoalAngle = taken.goalForScorer.a
                 state.local.goalTimer = 0
             } else {
                 state.local.goalTimer++
@@ -115,26 +115,29 @@ const ScorerTA = {
 
         grVisible(taken, state) {
             state.next = true
-            return !!taken.goal
+            return !!taken.goalForScorer
         },
 
         rotateKick(taken, state) {
             state.next = true
             if (state.variables.lastGoalAngle && state.variables.lastGoalAngle < 0) {
-                return {n: "kick", v: `10 -45`}
+                return {n: "kick", v: `4 -45`}
             }
-            return {n: "kick", v: `10 45`}
+            return {n: "kick", v: `4 45`}
         },
 
         powerKick(taken, state) {
             state.next = true
-            const angle = taken.goal.a
+            const angle = taken.goalForScorer.a
             return {n: "kick", v: `20 ${angle}`}
         },
 
         weakKick(taken, state) {
             state.next = true
-            const angle = taken.goal.a
+            const angle = taken.goalForScorer.a
+            if (taken.goalForScorer.d < 20) {
+                return {n: "kick", v: `40 ${angle}`}
+            } 
             return {n: "kick", v: `70 ${angle}`}
         },
     }
