@@ -18,6 +18,7 @@ const Taken = {
         } else {
             ball = null
         }
+        const ballForScorer = p[BALL[0]] ? p[BALL[0]] : null
         console.log("ball: ", ball)
         const goalOwn = p[GOAL_OWN] ? p[GOAL_OWN] : null
         const goal = this.getEnemyGoal(p)
@@ -39,7 +40,7 @@ const Taken = {
         const goalForScorer = this.getGoalForScorer(p)
 
         return {
-            ball: ball, goalOwn: goalOwn, goal: goal, closestPlayerToBall: closestPlayer,
+            ball: ball, goalOwn: goalOwn, goal: goal, closestPlayerToBall: closestPlayer, ballForScorer: ballForScorer,
             teamOwn: teamOwn, playerCoords: playerCoords, predictedPoint: predictedPoint, goalForScorer: goalForScorer
         }
     },

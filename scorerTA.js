@@ -72,10 +72,10 @@ const ScorerTA = {
             if (!state.local.ballTimer) state.local.ballTimer = 0
             if (!state.local.goalTimer) state.local.goalTimer = 0
 
-            if (taken.ball) {
-                state.variables.distBall = taken.ball.d
-                state.variables.angle = taken.ball.a
-                state.variables.lastBallAngle = taken.ball.a
+            if (taken.ballForScorer) {
+                state.variables.distBall = taken.ballForScorer.d
+                state.variables.angle = taken.ballForScorer.a
+                state.variables.lastBallAngle = taken.ballForScorer.a
                 state.local.ballTimer = 0
             } else {
                 state.local.ballTimer++
@@ -91,7 +91,7 @@ const ScorerTA = {
 
         ballVisible(taken, state) { // Виден ли мяч
             state.next = true
-            return !!taken.ball
+            return !!taken.ballForScorer
         },
 
         rotate(taken, state) { // Поворот, если не видно мяча
@@ -104,7 +104,7 @@ const ScorerTA = {
 
         turnToBall(taken, state) { // Поворот к мячу
             state.next = true
-            const angle = taken.ball.a
+            const angle = taken.ballForScorer.a
             return {n: "turn", v: angle}
         },
 
