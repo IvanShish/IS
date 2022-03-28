@@ -48,7 +48,6 @@ class Controller {
             console.log("ball caught")
         } else if (p[2].startsWith("goal_l") || p[2].startsWith("goal_r")) {
             console.log("goal")
-
             this.agent.audioGo = false
             this.agent.goalScored = true
         } else if (p[2] === "\"go\"") {
@@ -63,9 +62,9 @@ class Controller {
         if (!this.agent.run) return
         // if (this.agent.position === "r") return
         this.agent.act = this.manager.getAction(this.TA, p, this.agent.teamName, this.agent.position)
-        if (this.agent.act && this.agent.position === "r") {
-            console.log(this.agent.act)
-        }
+        // if (this.agent.act && this.agent.position === "r") {
+        //     console.log(this.agent.act)
+        // }
     }
 }
 
