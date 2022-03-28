@@ -1,4 +1,5 @@
-const farDist = 12, closeDist = 1
+const farDist = 15, closeDist = 2, GOALIE_ZONE_X = 47,
+    GOALIE_ZONE_Y = 8
 
 const GoalieTA = {
     current: "start", // Текущее состояние автомата
@@ -84,7 +85,7 @@ const GoalieTA = {
             if (!state.local.goalTimer) state.local.goalTimer = 0
 
             if (taken.ball) {
-                state.variables.dist = taken.ball.d
+                state.variables.dist = Math.abs(taken.ball.d)
                 state.variables.lastBallAngle = taken.ball.a
                 state.local.ballTimer = 0
             } else {
@@ -113,29 +114,41 @@ const GoalieTA = {
             let dist = taken.ball.d
             state.next = false
             if (dist > 0.5) {
-                if (state.local.catch < 3) {
+                if (state.local.catch < 3 && dist < closeDist) {
                     console.log('catch')
                     state.local.catch++
                     return {n: "catch", v: angle}
-                } else state.local.catch = 0
+                } else if (state.local.catch >= 3) state.local.catch = 0
                 if (Math.abs(angle) > 15) return {n: "turn", v: angle}
+                console.log('dash to ball')
                 return {n: "dash", v: 20}
             }
+            console.log("catch dist <= 0.5")
             state.next = true
         },
 
         kick(taken, state) { // Пинаем мяч
             state.next = true
-            if (!taken.ball) return
+            if (!taken.ball) {
+                console.log("kick !taken.ball ", state.local.ballTimer)
+                if (state.local.ballTimer <= 3) {
+                    const angle = state.variables.lastGoalAngle > 0 ? 45 : -45
+                    return {n: "turn", v: angle}
+                }
+                return
+            }
             let dist = taken.ball.d
             if (dist > 0.5) return
             let goal = taken.goal
             let player = taken.teamOwn ? taken.teamOwn[0] : null
+            let closestPlayerToBall = taken.closestPlayerToBall
             let target
             if (goal && player)
                 target = goal.d < player.d ? goal : player
             else if (goal) target = goal
             else if (player) target = player
+            if (closestPlayerToBall && closestPlayerToBall.d < 2)
+                target = {d: 20, a: 0}
             console.log('kick')
             if (target)
                 return {n: "kick", v: `${target.d * 2 + 40} ${target.a}`}
@@ -149,6 +162,7 @@ const GoalieTA = {
         goBack(taken, state) { // Возврат к воротам
             state.next = false
             let goalOwn = taken.goalOwn
+            console.log("goBack")
             if (!goalOwn) {
                 if (state.timers.goalTimer <= 3)
                     return {n: "turn", v: state.variables.lastGoalOwnAngle > 0 ? 100 : -100}
@@ -160,12 +174,13 @@ const GoalieTA = {
                 state.next = true
                 return {n: "turn", v: 180}
             }
-            return {n: "dash", v: goalOwn.d * 2 + 20}
+            return {n: "dash", v: 100}
         },
 
         lookAround(taken, state) { // Осматриваемся
             state.next = false
             state.synch = "lookAround!"
+            console.log("lookAround ", state.local.look)
             if (!state.local.look)
                 state.local.look = "left"
             switch (state.local.look) {
@@ -191,17 +206,32 @@ const GoalieTA = {
         canIntercept(taken, state) { // Можем добежать первыми
             let ball = taken.ball
             let closestPlayerToBall = taken.closestPlayerToBall
+            let predictedPoint = taken.predictedPoint
+            let playerCoords = taken.playerCoords
             state.next = true
-            if (!ball || !closestPlayerToBall) return false
+            if (!ball || !closestPlayerToBall ||
+                !predictedPoint || !playerCoords)
+                return false
+            if (predictedPoint === 1000 || Math.abs(predictedPoint - playerCoords.y) < closeDist) {
+                return true
+            }
             return ball.d <= closestPlayerToBall.d + 0.5;
         },
 
         runToBall(taken, state) { // Бежим к мячу
             state.next = false
             let ball = taken.ball
-            if (!ball) return this.goBack(taken, state)
+            if (!ball) {
+                if (state.local.ballTimer <= 3) {
+                    state.next = true
+                    const angle = state.variables.lastGoalAngle > 0 ? 45 : -45
+                    return {n: "turn", v: angle}
+                }
+                return this.goBack(taken, state)
+            }
             if (ball.d < closeDist) {
                 state.next = true
+                console.log("runToBall next")
                 return
             }
             if (Math.abs(ball.a) > 10) {
@@ -210,32 +240,47 @@ const GoalieTA = {
             return {n: "dash", v: 110}
         },
 
-        ok(taken, state) { // Поворот к мячу, если его видно
-            state.next = true;
+        ok(taken, state) { // Поворот к мячу, если его He видно
+            state.next = false
+            const playerCoords = taken.playerCoords
+            if (!playerCoords) return this.lookAround(taken, state)
+            if (playerCoords.x < GOALIE_ZONE_X ||
+                playerCoords.y < -GOALIE_ZONE_Y ||
+                playerCoords.y > GOALIE_ZONE_Y) {
+                return this.goBack(taken, state)
+            }
             const ball = taken.ball
-            if (!ball) return {n: "turn", v: 0}
+            if (!ball) {
+                if (state.local.ballTimer <= 3) {
+                    state.next = true
+                    const angle = state.variables.lastGoalAngle > 0 ? 45 : -45
+                    return {n: "turn", v: angle}
+                }
+                return this.lookAround(taken, state)
+            }
+            state.next = true
+            console.log("turn to ball")
             return {n: "turn", v: ball.a}
         },
 
         predict(taken, state) { // Предсказывание движения мяча
-            state.next = false;
+            state.next = true
             const predictedPoint = taken.predictedPoint
+            console.log("predict")
             if (!predictedPoint || !taken.playerCoords) {
-                console.log(225)
                 const ball = taken.ball
                 if (!ball) return {n: "turn", v: 60}
                 return {n: "turn", v: ball.a}
             }
-            state.next = true;
             const playerCoords = taken.playerCoords
 
             if (predictedPoint === 1000 || Math.abs(predictedPoint - playerCoords.y) < closeDist) {
-                console.log(232)
-                return this.runToBall(taken, state)
+                const ball = taken.ball
+                if (!ball) return {n: "turn", v: 60}
+                return {n: "turn", v: ball.a}
             }
 
             const angle = predictedPoint < playerCoords.y ? 90 : -90
-            console.log(237)
             return {n: "dash", v: `100 ${angle}`}
         }
     }

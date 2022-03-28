@@ -55,7 +55,7 @@ class Controller {
     }
 
     analyzeSee(msg, cmd, p) { // Анализ сообщения
-        // if (!this.agent.run) return
+        if (!this.agent.run) return
         // if (this.agent.position === "r") return
         this.agent.act = this.manager.getAction(this.TA, p, this.agent.teamName, this.agent.position)
     }
