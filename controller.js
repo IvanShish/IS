@@ -1,6 +1,6 @@
 const Msg = require("./msg")
-const ManagerTA = require("./managerTA")
-const goalieTA = require("./goalieTA")
+let ManagerTA = require("./managerTA")
+let goalieTA = require("./goalieTA")
 const scorerTA = require("./scorerTA")
 
 class Controller {
@@ -39,11 +39,16 @@ class Controller {
         if (p[2] === "play_on") {
             this.agent.run = true
             this.agent.goalScored = false
+            if (!this.agent.controller.isSc) {
+                this.TA.current = 'start'
+                this.manager = new ManagerTA(this)
+            }
             return
         } else if (p[2].startsWith("goalie_catch_ball")) {
             console.log("ball caught")
         } else if (p[2].startsWith("goal_l") || p[2].startsWith("goal_r")) {
             console.log("goal")
+
             this.agent.audioGo = false
             this.agent.goalScored = true
         } else if (p[2] === "\"go\"") {
@@ -58,7 +63,13 @@ class Controller {
         if (!this.agent.run) return
         // if (this.agent.position === "r") return
         this.agent.act = this.manager.getAction(this.TA, p, this.agent.teamName, this.agent.position)
+        if (this.agent.act && this.agent.position === "r") {
+            console.log(this.agent.act)
+        }
     }
 }
 
 module.exports = Controller
+
+// look around fix
+// 

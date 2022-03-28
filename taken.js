@@ -19,7 +19,6 @@ const Taken = {
             ball = null
         }
         const ballForScorer = p[BALL[0]] ? p[BALL[0]] : null
-        console.log("ball: ", ball)
         const goalOwn = p[GOAL_OWN] ? p[GOAL_OWN] : null
         const goal = this.getEnemyGoal(p)
 

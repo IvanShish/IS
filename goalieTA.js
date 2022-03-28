@@ -1,4 +1,4 @@
-const farDist = 15, closeDist = 2, GOALIE_ZONE_X = 47,
+const farDist = 20, closeDist = 1.5, GOALIE_ZONE_X = 47,
     GOALIE_ZONE_Y = 8
 
 const GoalieTA = {
@@ -11,7 +11,7 @@ const GoalieTA = {
         timers: {t: 0}, // Таймеры
         next: true, // Нужен переход на следующее состояние
         synch: undefined, // Текущее действие
-        local: {}, // Внутренние переменные для методов
+        local: {goalie: true, catch: 0}, // Внутренние переменные для методов
     },
 
     nodes: { /* Узлы автомата, в каждом узле: имя и узлы, на кото-
@@ -113,17 +113,16 @@ const GoalieTA = {
             let angle = taken.ball.a
             let dist = taken.ball.d
             state.next = false
-            if (dist > 0.5) {
-                return {n: "catch", v: angle}
-                // console.log(117, ', ', state.local.catch)
-                // if (state.local.catch < 3) {
-                //     console.log('catch')
-                //     state.local.catch++
-                //     return {n: "catch", v: angle}
-                // } else state.local.catch = 0
-                // if (Math.abs(angle) > 15) return {n: "turn", v: angle}
-                // console.log('dash to ball')
-                // return {n: "dash", v: 5}
+            if (dist > 0.5 && dist <= closeDist) {
+                console.log(117, ', ', state.local.catch)
+                if (state.local.catch < 3) {
+                    console.log('catch', angle, dist)
+                    state.local.catch++
+                    return {n: "catch", v: angle}
+                } else state.local.catch = 0
+                if (Math.abs(angle) > 15) return {n: "turn", v: angle}
+                console.log('dash to ball')
+                return {n: "dash", v: 5}
             }
             console.log("catch dist <= 0.5")
             state.next = true
@@ -149,16 +148,17 @@ const GoalieTA = {
                 target = goal.d < player.d ? goal : player
             else if (goal) target = goal
             else if (player) target = player
-            if (closestPlayerToBall && closestPlayerToBall.d < 2)
-                target = {d: 20, a: 0}
+            if (closestPlayerToBall && closestPlayerToBall.d < 5)
+                target = {d: 25, a: 0}
             console.log('kick')
-            if (target)
-                return {n: "kick", v: `${target.d * 2 + 40} ${target.a}`}
-            let angle = 45
-            if (state.local.goalTimer <= 3) {
-                angle = state.variables.lastGoalAngle > 0 ? 45 : -45
-            }
-            return {n: "kick", v: `10 ${angle}`}
+            // if (target)
+            //     return {n: "kick", v: `${target.d * 2 + 40} ${target.a}`}
+            // let angle = 45
+            // if (state.local.goalTimer <= 3) {
+            //     angle = state.variables.lastGoalAngle > 0 ? 45 : -45
+            // }
+            // return {n: "kick", v: `10 ${angle}`}
+            return {n: "kick", v: `100 0`}
         },
 
         goBack(taken, state) { // Возврат к воротам
