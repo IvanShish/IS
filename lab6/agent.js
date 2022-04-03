@@ -16,6 +16,7 @@ class Agent {
         this.controller.setAgent(this)
         this.audioGo = false
         this.goalScored = false
+        this.number = null
     }
 
     msgGot(msg) { // Получение сообщения
