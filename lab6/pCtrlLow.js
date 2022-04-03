@@ -9,7 +9,7 @@ const CTRL_LOW = {
             this.taken.inZone = true
         } else {
             this.taken.centerZoneX = (zone.xl + zone.xr) / 2
-            this.taken.centerZoneY = (zone.yu + zone.yl) / 2
+            this.taken.centerZoneY = (zone.yu + zone.yd) / 2
             this.taken.inZone = false
         }
 
