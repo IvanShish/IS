@@ -66,7 +66,7 @@ module.exports = {
         const eps = 0.00001
 
         // Проверка лежит ли точка внутри поля
-        if (x >= -maxX - eps && x <= maxX + eps && y >= -maxY - eps && y <= maxY + eps) { 
+        if (x >= -maxX - eps && x <= maxX + eps && y >= -maxY - eps && y <= maxY + eps) {
             // Проверка на выполнение первоначальных условий системы
             b1 = Math.abs(d1 ** 2 - ((x - x1) ** 2 + (y - y1) ** 2)) < eps
             b2 = Math.abs(d2 ** 2 - ((x - x2) ** 2 + (y - y2) ** 2)) < eps
@@ -106,12 +106,12 @@ module.exports = {
     },
 
     coord2flagsEqXgetY(d1, x1, y1, d2, x2, y2) {
-        y = (y2**2 - y1**2 + d1**2 - d2**2) / (2*(y2 - y1))
+        y = (y2 ** 2 - y1 ** 2 + d1 ** 2 - d2 ** 2) / (2 * (y2 - y1))
         return y
     },
 
     coord2flagsEqYgetX(d1, x1, y1, d2, x2, y2) {
-        x = (x2**2 - x1**2 + d1**2 - d2**2) / (2*(x2 - x1))
+        x = (x2 ** 2 - x1 ** 2 + d1 ** 2 - d2 ** 2) / (2 * (x2 - x1))
         return x
     },
 
@@ -290,7 +290,7 @@ module.exports = {
 
         for (let i = 0; i < p.length; i++) {
             if (p[i].d > 40) continue
-            for (let j = i+1; j < p.length; j++) {
+            for (let j = i + 1; j < p.length; j++) {
                 if (p[j].d > 40) continue
                 if (p[i].x === p[j].x && p[i].y !== p[j].y) {
                     currentSum = p[i].d + p[j].d
@@ -298,8 +298,7 @@ module.exports = {
                         minDistX = currentSum
                         indexes.eqX = [i, j]
                     }
-                }
-                else if (p[i].y === p[j].y && p[i].x !== p[j].x) {
+                } else if (p[i].y === p[j].y && p[i].x !== p[j].x) {
                     currentSum = p[i].d + p[j].d
                     if (currentSum < minDistY) {
                         minDistY = currentSum
@@ -334,11 +333,11 @@ module.exports = {
         let indexes = this.selectFlagsWithEq(p)
         if (indexes.eqX) {
             resY = this.coord2flagsEqXgetY(p[indexes.eqX[0]].d, p[indexes.eqX[0]].x, p[indexes.eqX[0]].y,
-             p[indexes.eqX[1]].d, p[indexes.eqX[1]].x, p[indexes.eqX[1]].y)
+                p[indexes.eqX[1]].d, p[indexes.eqX[1]].x, p[indexes.eqX[1]].y)
         }
         if (indexes.eqY) {
             resX = this.coord2flagsEqYgetX(p[indexes.eqY[0]].d, p[indexes.eqY[0]].x, p[indexes.eqY[0]].y,
-             p[indexes.eqY[1]].d, p[indexes.eqY[1]].x, p[indexes.eqY[1]].y)
+                p[indexes.eqY[1]].d, p[indexes.eqY[1]].x, p[indexes.eqY[1]].y)
         }
 
         if (!resX || !resY) {
@@ -349,9 +348,8 @@ module.exports = {
                     if (!resX) resX = coord.x
                     if (!resY) resY = coord.y
                 }
-            }
-            else {
-                coord = this.coord3flags(p[indexes[0]].d, p[indexes[0]].x, p[indexes[0]].y, p[indexes[1]].d, 
+            } else {
+                coord = this.coord3flags(p[indexes[0]].d, p[indexes[0]].x, p[indexes[0]].y, p[indexes[1]].d,
                     p[indexes[1]].x, p[indexes[1]].y, p[indexes[2]].d, p[indexes[2]].x, p[indexes[2]].y)
                 if (coord) {
                     if (!resX) resX = coord.x
@@ -382,15 +380,15 @@ module.exports = {
 
         if (p.length < 1) {
             return null
-        }
-        else if (p.length === 1) { // Недостаточно флагов
+        } else if (p.length === 1) { // Недостаточно флагов
             coord = this.coordObj1flags(p[0].d, p[0].x, p[0].y, p[0].a, obj.d, playerX, playerY, obj.a)
             return coord
-        }
-        else {
-            p.sort((x, y) => {return x.d > y.d})
+        } else {
+            p.sort((x, y) => {
+                return x.d > y.d
+            })
             coord = this.coordObj2flags(p[0].d, p[0].x, p[0].y, p[0].a, obj.d, playerX, playerY, obj.a,
-             p[1].d, p[1].x, p[1].y, p[1].a)
+                p[1].d, p[1].x, p[1].y, p[1].a)
             return coord
         }
     },
@@ -416,7 +414,7 @@ module.exports = {
 
         if (p.length === 1) { // Вычисление координат через 2 флага
             for (let obj of objs) {
-                coord = this.coordObj1flags(p[0].d, p[0].x, p[0].y, p[0].a, 
+                coord = this.coordObj1flags(p[0].d, p[0].x, p[0].y, p[0].a,
                     obj.d, playerX, playerY, obj.a)
                 if (coord) {
                     coord.d = obj.d
@@ -425,9 +423,11 @@ module.exports = {
                 }
             }
         } else {
-            p.sort((x, y) => {return x.d > y.d})
+            p.sort((x, y) => {
+                return x.d > y.d
+            })
             for (let obj of objs) {
-                coord = this.coordObj2flags(p[0].d, p[0].x, p[0].y, p[0].a, obj.d, 
+                coord = this.coordObj2flags(p[0].d, p[0].x, p[0].y, p[0].a, obj.d,
                     playerX, playerY, obj.a, p[1].d, p[1].x, p[1].y, p[1].a)
                 if (coord) {
                     coord.d = obj.d
@@ -444,8 +444,9 @@ module.exports = {
             ballCoord = this.calculateObjCoord(notParsedP, playerX, playerY, 'B')
         if (!ballCoord)
             return null
-        coords.sort((x, y) => 
-            {return (x.x - ballCoord.x)**2 + (x.y - ballCoord.y) ** 2 > (y.x - ballCoord.x)**2 + (y.y - ballCoord.y) ** 2})
+        coords.sort((x, y) => {
+            return (x.x - ballCoord.x) ** 2 + (x.y - ballCoord.y) ** 2 > (y.x - ballCoord.x) ** 2 + (y.y - ballCoord.y) ** 2
+        })
         return coords[0]
     },
 
@@ -457,12 +458,12 @@ module.exports = {
         }
         flag = p[0]
 
-        dist = Math.sqrt((pointX-playerX)**2 + (pointY-playerY)**2)
-        anglePart = Math.acos(((pointX-playerX)*(flag.x-playerX) + (pointY-playerY)*(flag.y-playerY)) / (flag.d*dist))
+        dist = Math.sqrt((pointX - playerX) ** 2 + (pointY - playerY) ** 2)
+        anglePart = Math.acos(((pointX - playerX) * (flag.x - playerX) + (pointY - playerY) * (flag.y - playerY)) / (flag.d * dist))
 
         k = (flag.y - playerY) / (flag.x - playerX)
         b = flag.y - k * flag.x
-        const isUp = point.y > k * point.x + b
+        const isUp = pointY > k * pointX + b
         if (!isUp) {
             anglePart *= -1
         }

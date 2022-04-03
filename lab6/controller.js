@@ -68,7 +68,7 @@ class Controller {
         if (!this.agent.run) return
 
         this.agent.act = this.CTRL.execute(p, this.CTRLS, this.agent.teamName, this.agent.position,
-            {xc: 0, yc: 0, xl: -17.5, yu: 10, xr: 17.5, yd: -10})
+            {xc: 0, yc: 0, xl: -17.5, yl: 10, xr: 17.5, yu: -10})
         if (this.agent.act) {
             console.log(this.agent.act)
         }
