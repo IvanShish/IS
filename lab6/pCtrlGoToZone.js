@@ -24,18 +24,15 @@ const CTRL_GO_TO_ZONE = {
             if (Math.abs(ball.a) > 10) return {n: "turn", v: ball.a}
             return {n: "dash", v: 100}
         }
-        console.log(input.inZone)
 
         if (!input.inZone) {
             const playerCoords = input.playerCoords
-            console.log(31)
             if (!playerCoords) return null
-            console.log(input.centerZoneX, input.centerZoneY)
             if (Math.abs(playerCoords.x - input.centerZoneX) > epsCenter ||
                 Math.abs(playerCoords.y - input.centerZoneY) > epsCenter) {
                 const angle = coord.calculateAngleToPoint(input.notParsedP, playerCoords.x, playerCoords.y,
                     input.centerZoneX, input.centerZoneY)
-                if (angle > 10) return {n: "turn", v: angle}
+                if (Math.abs(angle) > 10) return {n: "turn", v: angle}
                 return {n: "dash", v: 100}
             }
         }

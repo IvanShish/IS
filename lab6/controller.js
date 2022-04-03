@@ -69,7 +69,7 @@ class Controller {
 
         this.agent.act = this.CTRL.execute(p, this.CTRLS, this.agent.teamName, this.agent.position,
             {xc: 0, yc: 22, xl: 17.5, yd: 34, xr: 35, yu: 10})
-        if (this.agent.act) {
+        if (!this.isGk && this.agent.act) {
             console.log(this.agent.act)
         }
     }
