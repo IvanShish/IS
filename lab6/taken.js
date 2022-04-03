@@ -37,9 +37,11 @@ const Taken = {
         const predictedPoint = this.getPredictedPoint()
         const closestPlayer = this.getClosestPlayerToBall(notParsedP)
         const goalForScorer = this.getGoalForScorer(p)
+        const distClosestPlToBall = this.getDistClosestPlToBall(closestPlayer)
 
         return {
-            ball: ball, goalOwn: goalOwn, goal: goal, closestPlayerToBall: closestPlayer, ballForScorer: ballForScorer,
+            ball: ball, goalOwn: goalOwn, goal: goal, closestPlayerToBall: closestPlayer,
+            distClosestPlToBall: distClosestPlToBall, ballForScorer: ballForScorer,
             teamOwn: teamOwn, playerCoords: playerCoords, predictedPoint: predictedPoint, goalForScorer: goalForScorer,
             flags: p, teamName: teamName, side: side
         }
@@ -98,18 +100,16 @@ const Taken = {
         return k * playerCoords.x + b
     },
 
-    // getClosestPlayerToBall(p) {
-    //     if (!this.playerCoords) return null
-    //     const closestPlayer = coord.calculateClosestPlayerToBall(p, this.playerCoords.x, this.playerCoords.y)
-    //     const ballCoords = this.ballCoords
-    //     if (!closestPlayer || !ballCoords) return null
-    //     const d = Math.sqrt((ballCoords.x - closestPlayer.x) ** 2 + (ballCoords.y - closestPlayer.y) ** 2)
-    //     return {d: d}
-    // },
+    getDistClosestPlToBall(closestPlayer) {
+        const ballCoords = this.ballCoords
+        if (!closestPlayer || !ballCoords) return null
+        const d = Math.sqrt((ballCoords.x - closestPlayer.x) ** 2 + (ballCoords.y - closestPlayer.y) ** 2)
+        return {d: d}
+    },
+
     getClosestPlayerToBall(p) {
         if (!this.playerCoords) return null
-        const closestPlayer = coord.calculateClosestPlayerToBall(p, this.playerCoords.x, this.playerCoords.y)
-        return closestPlayer
+        return coord.calculateClosestPlayerToBall(p, this.playerCoords.x, this.playerCoords.y)
     },
 
     getGoalForScorer(p) {

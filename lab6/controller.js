@@ -2,7 +2,7 @@ const Msg = require("./msg")
 
 const CTRL_LOW = require("./gCtrlLow")
 const CTRL_MIDDLE = require("./gCtrlMiddle")
-const CTRL_HIGHT = require("./gCtrlHight")
+const CTRL_HIGHT = require("./gCtrlHigh")
 
 class Controller {
     constructor() {
