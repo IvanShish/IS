@@ -13,7 +13,7 @@ module.exports = function (agent, teamName, version) {
             })
         }
         // Инициализация игрока на сервере
-        if (!agent.controller.isSc) {
+        if (agent.controller.isGk) {
             socket.sendMsg(`(init ${teamName} (version ${version}) (goalie))`)
         } else {
             socket.sendMsg(`(init ${teamName} (version ${version}))`)

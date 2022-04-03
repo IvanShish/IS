@@ -4,19 +4,22 @@ const CTRL_LOW = require("./gCtrlLow")
 const CTRL_MIDDLE = require("./gCtrlMiddle")
 const CTRL_HIGHT = require("./gCtrlHigh")
 
+const P_CTRL_LOW = require("./pCtrlLow")
+
 class Controller {
     constructor() {
         this.agent = null
         this.CTRL = null
-        this.isSc
+        this.CTRLS = []
+        this.isGk = null
     }
 
     setAgent(agent) {
         this.agent = agent
     }
 
-    setIsSc(isSc) {
-        this.isSc = isSc
+    setIsGk(isGk) {
+        this.isGk = isGk
     }
 
     processMsg(msg) { // Обработка сообщения
@@ -31,10 +34,13 @@ class Controller {
     initAgent(p) {
         if (p[0] === "r") this.agent.position = "r" // Правая половина поля
         if (p[1]) this.agent.id = p[1] // id игрока
-        if (this.agent.controller.isSc) {
-            this.CTRL = null
+        if (!this.isGk) {
+            this.CTRL = P_CTRL_LOW
+            this.CTRLS = []
+        } else {
+            this.CTRL = CTRL_LOW
+            this.CTRLS = [CTRL_MIDDLE, CTRL_HIGHT]
         }
-        else this.CTRL = CTRL_LOW
     }
 
     analyzeHear(p) {
@@ -46,20 +52,15 @@ class Controller {
             console.log("ball caught")
         } else if (p[2].startsWith("goal_l") || p[2].startsWith("goal_r")) {
             console.log("goal")
-            this.agent.audioGo = false
             this.agent.goalScored = true
-        } else if (p[2] === "\"go\"") {
-            console.log("go")
-            this.agent.audioGo = true
-            return
         }
         this.agent.run = false
     }
 
     analyzeSee(msg, cmd, p) { // Анализ сообщения
         if (!this.agent.run) return
-        // if (this.agent.position === "r") return
-        this.agent.act = this.CTRL.execute(p, [CTRL_MIDDLE, CTRL_HIGHT], this.agent.teamName, this.agent.position)
+
+        this.agent.act = this.CTRL.execute(p, this.CTRLS, this.agent.teamName, this.agent.position)
         if (this.agent.act) {
             console.log(this.agent.act)
         }
@@ -67,6 +68,3 @@ class Controller {
 }
 
 module.exports = Controller
-
-// look around fix
-// 
