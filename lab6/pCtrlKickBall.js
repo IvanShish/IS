@@ -9,12 +9,13 @@ const CTRL_GO_TO_BALL = {
 
         this.lastAddressee = ""
         const nextControllers = controllers[level + treeSide]
+        if (!nextControllers) return null
         if (nextControllers.length === 2) {
-            const next = nextControllers[0].execute(this.taken, controllers, level + 1, "L")
+            const next = nextControllers[0].execute(input, controllers, level + 1, "L")
             if (next) return next
-            else return nextControllers[1].execute(this.taken, controllers, level + 1, "R")
+            else return nextControllers[1].execute(input, controllers, level + 1, "R")
         } else if (nextControllers.length === 1) {
-            return nextControllers[0].execute(this.taken, controllers, level + 1, "L")
+            return nextControllers[0].execute(input, controllers, level + 1, "L")
         }
         return null
     },

@@ -41,7 +41,7 @@ const Taken = {
 
         return {
             ball: ball, goalOwn: goalOwn, goal: goal, closestPlayerToBall: closestPlayer,
-            distClosestPlToBall: distClosestPlToBall, ballForScorer: ballForScorer,
+            distClosestPlToBall: distClosestPlToBall, ballForScorer: ballForScorer, ballCoords: this.ballCoords,
             teamOwn: teamOwn, playerCoords: playerCoords, predictedPoint: predictedPoint, goalForScorer: goalForScorer,
             flags: p, teamName: teamName, side: side, notParsedP: notParsedP
         }

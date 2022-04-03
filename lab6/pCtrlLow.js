@@ -13,19 +13,15 @@ const CTRL_LOW = {
             this.taken.inZone = false
 
         // В зоне ли мяч
-        if (this.taken.ball && this.taken.ballCoords.x >= zone.xl && this.taken.ballCoords.x <= zone.xr &&
-            this.taken.ballCoords.y >= zone.yd && this.taken.ballCoords.y <= zone.yu)
-            this.taken.ballInZone = true
-        else
-            this.taken.ballInZone = false
+        this.taken.ballInZone = this.taken.ball && this.taken.ballCoords &&
+            this.taken.ballCoords.x >= zone.xl && this.taken.ballCoords.x <= zone.xr &&
+            this.taken.ballCoords.y >= zone.yd && this.taken.ballCoords.y <= zone.yu;
 
         // Мяч рядом
-        if (this.taken.ball && this.taken.ball.d < 0.5)
-            this.taken.canKick = true
-        else
-            this.taken.canKick = false
+        this.taken.canKick = this.taken.ball && this.taken.ball.d < 0.5;
 
         const nextControllers = controllers["1"]
+        if (!nextControllers) return null
         if (nextControllers.length === 2) {
             const next = nextControllers[0].execute(this.taken, controllers, "2", "L")
             if (next) return next
