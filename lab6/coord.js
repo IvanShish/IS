@@ -192,6 +192,10 @@ module.exports = {
         return Math.PI * a / 180
     },
 
+    toGrad(a) {
+        return a * 180 / Math.PI
+    },
+
     coordObj2flags(d1, x1, y1, alpha1, da, xa, ya, alphaa, d2, x2, y2, alpha2) {
         // Вычисление расстояний относительно противника
         da1 = Math.sqrt(d1 ** 2 + da ** 2 - 2 * d1 * da * Math.cos(this.toRad(Math.abs(alpha1 - alphaa))))
@@ -391,43 +395,6 @@ module.exports = {
         }
     },
 
-    // calculateClosestPlayerToBall(notParsedP, playerX, playerY) {
-    //     p = this.parseCoord(notParsedP) // Преобразование в удобные значения
-    //     let objects = p.obj
-    //     let objs = []
-    //     for (let v of objects) {
-    //         if (v.name.startsWith("p")) {
-    //             objs.push(v)
-    //         }
-    //     }
-    //     if (objs.length === 0) {
-    //         return null
-    //     }
-    //     p = p.flags
-    //     let coords = []
-
-    //     if (p.length < 1) {
-    //         return null
-    //     }
-
-    //     if (p.length === 1) { // Вычисление координат через 2 флага
-    //         for (let obj of objs) {
-    //             coords.push(this.coordObj1flags(p[0].d, p[0].x, p[0].y, p[0].a, 
-    //                 obj.d, playerX, playerY, obj.a))
-    //         }
-    //     } else {
-    //         p.sort((x, y) => {return x.d > y.d})
-    //         for (let obj of objs) {
-    //             coords.push(this.coordObj2flags(p[0].d, p[0].x, p[0].y, p[0].a, obj.d, 
-    //                 playerX, playerY, obj.a, p[1].d, p[1].x, p[1].y, p[1].a))
-    //         }
-    //     }
-
-    //     if (!coords || coords.length === 0) return null
-    //     coords.sort((x, y) => {return x.d - y.d})
-    //     return coords[0]
-    // }
-
     calculateClosestPlayerToBall(notParsedP, playerX, playerY) {
         p = this.parseCoord(notParsedP) // Преобразование в удобные значения
         let objects = p.obj
@@ -480,5 +447,27 @@ module.exports = {
         coords.sort((x, y) => 
             {return (x.x - ballCoord.x)**2 + (x.y - ballCoord.y) ** 2 > (y.x - ballCoord.x)**2 + (y.y - ballCoord.y) ** 2})
         return coords[0]
+    },
+
+    calculateAngleToPoint(notParsedP, playerX, playerY, pointX, pointY) {
+        p = this.parseCoord(notParsedP)
+        p = p.flags
+        if (p.length === 0) {
+            return null
+        }
+        flag = p[0]
+
+        dist = Math.sqrt((pointX-playerX)**2 + (pointY-playerY)**2)
+        anglePart = Math.acos(((pointX-playerX)*(flag.x-playerX) + (pointY-playerY)*(flag.y-playerY)) / (flag.d*dist))
+
+        k = (flag.y - playerY) / (flag.x - playerX)
+        b = flag.y - k * flag.x
+        const isUp = point.y > k * point.x + b
+        if (!isUp) {
+            anglePart *= -1
+        }
+
+        return flag.a + this.toGrad(anglePart)
+
     }
 }
