@@ -43,7 +43,7 @@ const Taken = {
             ball: ball, goalOwn: goalOwn, goal: goal, closestPlayerToBall: closestPlayer,
             distClosestPlToBall: distClosestPlToBall, ballForScorer: ballForScorer,
             teamOwn: teamOwn, playerCoords: playerCoords, predictedPoint: predictedPoint, goalForScorer: goalForScorer,
-            flags: p, teamName: teamName, side: side
+            flags: p, teamName: teamName, side: side, notParsedP: notParsedP
         }
     },
 

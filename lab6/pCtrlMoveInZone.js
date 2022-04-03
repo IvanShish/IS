@@ -1,4 +1,4 @@
-const CTRL_GO_TO_BALL = {
+const CTRL_MOVE_IN_ZONE = {
     execute(input, controllers, level, treeSide) {
         const immediate = this.immediateReaction(input)
         if (immediate) return immediate
@@ -15,16 +15,13 @@ const CTRL_GO_TO_BALL = {
     },
 
     immediateReaction(input) {
-        if (input.ballInZone && !input.canKick) {
+        if (input.inZone) {
             const ball = input.ball
-            if (!ball) return {n: "turn", v: 45}
-            if (Math.abs(ball.a) > 10) {
-                return {n: "turn", v: ball.a}
-            }
-            return {n: "dash", v: 100}
+            if (!ball) return {n: "turn", v: 60}
+            if (Math.abs(ball.a) > 10) return {n: "turn", v: ball.a}
         }
         return null
     }
 }
 
-module.exports = CTRL_GO_TO_BALL
+module.exports = CTRL_MOVE_IN_ZONE

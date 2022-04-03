@@ -1,15 +1,20 @@
 const close_dist = 2, epsCenter = 2
+const coord = require("./coord")
 
 const CTRL_GO_TO_ZONE = {
-    execute(input, controllers) {
-        const next = controllers[0]
+    execute(input, controllers, level, treeSide) {
         const immediate = this.immediateReaction(input)
         if (immediate) return immediate
 
-        if (next) {
-            const command = next.execute(input, controllers.slice(1))
-            if (command) return command
+        const nextControllers = controllers[level + treeSide]
+        if (nextControllers.length === 2) {
+            const next = nextControllers[0].execute(this.taken, controllers, level + 1, "L")
+            if (next) return next
+            else return nextControllers[1].execute(this.taken, controllers, level + 1, "R")
+        } else if (nextControllers.length === 1) {
+            return nextControllers[0].execute(this.taken, controllers, level + 1, "L")
         }
+        return null
     },
 
     immediateReaction(input) {
@@ -24,7 +29,8 @@ const CTRL_GO_TO_ZONE = {
             if (!playerCoords) return null
             if (Math.abs(playerCoords.x - input.centerZoneX) > epsCenter ||
                 Math.abs(playerCoords.y - input.centerZoneY) > epsCenter) {
-                const angle = 0 // TODO: calculate angle
+                const angle = coord.calculateAngleToPoint(input.notParsedP, playerCoords.x, playerCoords.y,
+                    input.centerZoneX, input.centerZoneY)
                 if (angle > 10) return {n: "turn", v: angle}
                 return {n: "dash", v: 100}
             }

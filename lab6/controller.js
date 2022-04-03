@@ -5,12 +5,16 @@ const CTRL_MIDDLE = require("./gCtrlMiddle")
 const CTRL_HIGHT = require("./gCtrlHigh")
 
 const P_CTRL_LOW = require("./pCtrlLow")
+const P_CTRL_GO_TO_BALL = require("./pCtrlGoToBall")
+const P_CTRL_GO_TO_ZONE = require("./pCtrlGoToZone")
+const P_CTRL_KICK_BALL = require("./pCtrlKickBall")
+const P_CTRL_MOVE_IN_ZONE = require("./pCtrlMoveInZone")
 
 class Controller {
     constructor() {
         this.agent = null
         this.CTRL = null
-        this.CTRLS = []
+        this.CTRLS = null
         this.isGk = null
     }
 
@@ -36,7 +40,10 @@ class Controller {
         if (p[1]) this.agent.id = p[1] // id игрока
         if (!this.isGk) {
             this.CTRL = P_CTRL_LOW
-            this.CTRLS = []
+            this.CTRLS = {
+                "1": [P_CTRL_GO_TO_BALL, P_CTRL_GO_TO_ZONE], "2L": [P_CTRL_KICK_BALL],
+                "2R": [P_CTRL_MOVE_IN_ZONE]
+            }
         } else {
             this.CTRL = CTRL_LOW
             this.CTRLS = [CTRL_MIDDLE, CTRL_HIGHT]
