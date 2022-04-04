@@ -18,6 +18,7 @@ const CTRL_LOW = {
             this.taken.ballCoords.x >= zone.xl && this.taken.ballCoords.x <= zone.xr &&
             this.taken.ballCoords.y >= zone.yu && this.taken.ballCoords.y <= zone.yd;
 
+
         // Мяч рядом
         this.taken.canKick = this.taken.ball && this.taken.ball.d < 0.5;
 
