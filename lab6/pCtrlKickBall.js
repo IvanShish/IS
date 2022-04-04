@@ -1,4 +1,4 @@
-const bound_y = 34, bound_eps = 2
+const bound_y = 34, bound_eps = 2, farGoal = 15
 
 const CTRL_GO_TO_BALL = {
     lastAddressee: "",  // Последний адресат ("goal" или "player")
@@ -22,7 +22,8 @@ const CTRL_GO_TO_BALL = {
 
     immediateReaction(input) {
         if (input.canKick) {
-            const player = input.teamOwn ? input.teamOwn[0] : null
+            let player = null
+            if (!input.ownSide) player = input.teamOwn ? input.teamOwn[0] : null
             const goal = input.goal
             let target
             if (goal && player) {
@@ -41,7 +42,8 @@ const CTRL_GO_TO_BALL = {
             }
             else if (goal) {
                 this.lastAddressee = "goal"
-                target = goal
+                if (goal.d > farGoal) target = {a: goal.a, d: -12.5}
+                else target = {a: goal.a + 10, d: 30}
             }
             else if (player) {
                 this.lastAddressee = "player"
@@ -53,7 +55,6 @@ const CTRL_GO_TO_BALL = {
             }
             const playerCoords = input.playerCoords
             if (!playerCoords) return null
-            this.lastAddressee = ""
             if (playerCoords.y > bound_y - bound_eps)
                 return {n: "kick", v: `10 -45`}
             return {n: "kick", v: `10 45`}

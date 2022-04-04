@@ -1,5 +1,6 @@
 const coord = require("./coord")
-let BALL = ['b', 'B'], GOAL_OWN = 'gr', GOAL_ENEMY = ["gl", "fglt", "fglb"]
+let BALL = ['b', 'B'], GOAL_OWN = 'gr', GOAL_ENEMY = ["gl", "fglt", "fglb"],
+    OWN_SIDE = ["gr", "fgrt", "fgrb", "frb", "frt"]
 
 const Taken = {
     setSee(p, teamName, side) {
@@ -8,6 +9,7 @@ const Taken = {
         if (side === 'l') {
             GOAL_OWN = 'gl'
             GOAL_ENEMY = ["gr", "fgrt", "fgrb"]
+            OWN_SIDE = ["gl", "fglt", "fglb", "flb", "flt"]
         }
         const playerCoords = this.getPlayerCoords(notParsedP)
 
@@ -22,6 +24,7 @@ const Taken = {
         const ballForScorer = p[BALL[0]] ? p[BALL[0]] : null
         const goalOwn = p[GOAL_OWN] ? p[GOAL_OWN] : null
         const goal = this.getEnemyGoal(p)
+        const ownSide = this.getOwnSide(p)
 
         if (!this.ballPrevTimer && this.ballPrevTimer !== 0) {
             this.ballPrevTimer = 0
@@ -41,7 +44,7 @@ const Taken = {
         const distClosestPlToBall = this.getDistClosestPlToBall(closestPlayer)
 
         return {
-            ball: ball, goalOwn: goalOwn, goal: goal, closestPlayerToBall: closestPlayer,
+            ball: ball, goalOwn: goalOwn, goal: goal, closestPlayerToBall: closestPlayer, ownSide: ownSide,
             distClosestPlToBall: distClosestPlToBall, ballForScorer: ballForScorer, ballCoords: this.ballCoords,
             teamOwn: teamOwn, playerCoords: playerCoords, predictedPoint: predictedPoint, goalForScorer: goalForScorer,
             flags: p, teamName: teamName, side: side, notParsedP: notParsedP
@@ -58,6 +61,13 @@ const Taken = {
         return null
     },
 
+    getOwnSide(p) {
+        for (let fl of OWN_SIDE) {
+            if (p[fl]) return p[fl]
+        }
+        return null
+    },
+
     getTeamOwn(p, teamName) {
         let teamOwn = []
         for (let i in p) {
@@ -67,6 +77,12 @@ const Taken = {
         }
         return teamOwn
     },
+
+    // getPlayerToPass(teamOwn) {
+    //     for (let pl in teamOwn) {
+    //
+    //     }
+    // },
 
     getPlayerCoords(p) {
         const coords = coord.calculatePlayerCoord(p)
