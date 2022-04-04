@@ -9,6 +9,7 @@ const Taken = {
             GOAL_OWN = 'gl'
             GOAL_ENEMY = ["gr", "fgrt", "fgrb"]
         }
+        const playerCoords = this.getPlayerCoords(notParsedP)
 
         let ball
         if (p[BALL[0]]) {
@@ -30,10 +31,10 @@ const Taken = {
         } else {
             this.ballPrevTimer++
         }
-        this.ballCoords = this.getBallCoords(notParsedP)
+        const ballCoords = this.getBallCoords(notParsedP)
+        if (ballCoords) this.ballCoords = ballCoords
 
         const teamOwn = this.getTeamOwn(p, teamName)
-        const playerCoords = this.getPlayerCoords(notParsedP)
         const predictedPoint = this.getPredictedPoint()
         const closestPlayer = this.getClosestPlayerToBall(notParsedP)
         const goalForScorer = this.getGoalForScorer(p)

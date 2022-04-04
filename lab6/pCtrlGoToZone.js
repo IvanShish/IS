@@ -25,16 +25,14 @@ const CTRL_GO_TO_ZONE = {
             return {n: "dash", v: 100}
         }
 
-        if (!input.inZone) {
-            const playerCoords = input.playerCoords
-            if (!playerCoords) return null
-            if (Math.abs(playerCoords.x - input.centerZoneX) > epsCenter ||
-                Math.abs(playerCoords.y - input.centerZoneY) > epsCenter) {
-                const angle = coord.calculateAngleToPoint(input.notParsedP, playerCoords.x, playerCoords.y,
-                    input.centerZoneX, input.centerZoneY)
-                if (Math.abs(angle) > 10) return {n: "turn", v: angle}
-                return {n: "dash", v: 100}
-            }
+        const playerCoords = input.playerCoords
+        if (!playerCoords) return null
+        if (Math.abs(playerCoords.x - input.centerZoneX) > epsCenter ||
+            Math.abs(playerCoords.y - input.centerZoneY) > epsCenter) {
+            const angle = coord.calculateAngleToPoint(input.notParsedP, playerCoords.x, playerCoords.y,
+                input.centerZoneX, input.centerZoneY)
+            if (Math.abs(angle) > 10) return {n: "turn", v: angle}
+            return {n: "dash", v: 100}
         }
         return null
     }

@@ -18,7 +18,9 @@ const CTRL_GO_TO_BALL = {
     immediateReaction(input) {
         if (input.ballInZone && !input.canKick) {
             const ball = input.ball
-            if (!ball) return {n: "turn", v: 45}
+            if (!ball) {
+                return {n: "turn", v: 45}
+            }
             if (Math.abs(ball.a) > 10) {
                 return {n: "turn", v: ball.a}
             }

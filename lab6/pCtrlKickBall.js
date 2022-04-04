@@ -49,15 +49,14 @@ const CTRL_GO_TO_BALL = {
             }
 
             if (target) {
-                console.log(target)
                 return {n: "kick", v: `${target.d * 2 + 40} ${target.a}`}
             }
             const playerCoords = input.playerCoords
             if (!playerCoords) return null
             this.lastAddressee = ""
             if (playerCoords.y > bound_y - bound_eps)
-                return {n: "kick", v: `10 45`}  // mb pomenyat' nado
-            return {n: "kick", v: `10 -45`}
+                return {n: "kick", v: `10 -45`}
+            return {n: "kick", v: `10 45`}
         }
         return null
     }
