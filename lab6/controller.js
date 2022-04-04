@@ -15,22 +15,7 @@ class Controller {
         this.agent = null
         this.CTRL = null
         this.CTRLS = null
-        this.isGk = null
-        this.zoneCoords = {
-            1: {xc: -35, yc: -27.075, xl: -52.5, yd: -20.15, xr: -17.5, yu: -34},
-            2: {xc: -26.75, yc: -10.075, xl: -36, yd: 0, xr: -17.5, yu: -20.15},
-            3: {xc: -26.75, yc: 10.075, xl: -36, yd: 20.15, xr: -17.5, yu: 0},
-            4: {xc: -35, yc: 27.075, xl: -52.5, yd: 34, xr: -17.5, yu: 20.15},
-
-            5: {xc: 0, yc: -22, xl: -17.5, yd: -10, xr: 17.5, yu: -34},
-            6: {xc: 0, yc: 0, xl: -17.5, yd: 10, xr: 17.5, yu: -10},
-            7: {xc: 0, yc: 22, xl: -17.5, yd: 34, xr: 17.5, yu: 10},
-
-            8: {xc: 35, yc: -22, xl: 17.5, yd: -10, xr: 52.5, yu: -34},
-            9: {xc: 35, yc: 0, xl: 17.5, yd: 10, xr: 52.5, yu: -10},
-            10: {xc: 35, yc: 22, xl: 17.5, yd: 34, xr: 52.5, yu: 10}
-        }
-    }
+        this.isGk = null    }
 
     setAgent(agent) {
         this.agent = agent
@@ -115,7 +100,7 @@ class Controller {
 
         this.agent.act = this.CTRL.execute(p, this.CTRLS, this.agent.teamName, this.agent.position,
             this.zoneCoords[this.agent.number])
-        if (!this.isGk && this.agent.act) {
+        if (!this.isGk && this.agent.act && this.agent.number === "8") {
             console.log(this.agent.act)
         }
     }

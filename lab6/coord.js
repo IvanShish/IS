@@ -465,7 +465,8 @@ module.exports = {
 
         k = (flag.y - playerY) / (flag.x - playerX)
         b = flag.y - k * flag.x
-        const isUp = pointY > k * pointX + b
+        let isUp = pointY > k * pointX + b
+        if (k > 0) isUp = !isUp
         if (!isUp) {
             anglePart *= -1
         }
