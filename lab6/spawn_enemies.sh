@@ -1,0 +1,2 @@
+#!/bin/bash
+node app.js < files/eg.txt & node app.js < files/e1.txt & node app.js < files/e2.txt & node app.js < files/e3.txt & node app.js < files/e4.txt & node app.js < files/e5.txt & node app.js < files/e6.txt & node app.js < files/e7.txt & node app.js < files/e8.txt & node app.js < files/e9.txt & node app.js < files/e10.txt
