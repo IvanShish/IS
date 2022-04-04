@@ -61,7 +61,7 @@ const Taken = {
         let teamOwn = []
         for (let i in p) {
             if (i[0] === 'p' && i.split('"')[1] === teamName) {
-                teamOwn.push(i)
+                teamOwn.push(p[i])
             }
         }
         return teamOwn

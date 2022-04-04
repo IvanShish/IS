@@ -48,8 +48,10 @@ const CTRL_GO_TO_BALL = {
                 target = player
             }
 
-            if (target)
-                return {n: "kick", v: `${target.d * 2 + 40} ${input.goal.a}`}
+            if (target) {
+                console.log(target)
+                return {n: "kick", v: `${target.d * 2 + 40} ${target.a}`}
+            }
             const playerCoords = input.playerCoords
             if (!playerCoords) return null
             this.lastAddressee = ""
